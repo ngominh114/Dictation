@@ -171,7 +171,7 @@ graph LR
 | Data | Integer ms for audio positions; UTC `DateTime`; `Guid` ids; `TimeProvider` for time; camelCase JSON, nulls omitted; internal enums persisted by name |
 | Errors | `ProblemDetails` for every HTTP error (exception detail in Development only); no exception escapes one lesson's import |
 | Logging | Structured; import logs carry `LessonId`, `Source`, `Stage`, detail; never headers or keys |
-| Config | Typed options under `Sources:*`, `Transcription:*`, `Import:*`; API keys only from user-secrets or environment variables |
+| Config | Typed options under `Sources:*`, `Transcription:*`, `Import:*`; API keys (`Transcription:{Provider}:ApiKey`) read from appsettings, set in the gitignored `appsettings.Local.json` and never committed |
 | Code | `async` I/O with `CancellationToken`; typed `HttpClient`s with the standard resilience handler; Kestrel on `localhost` |
 
 ## Stack

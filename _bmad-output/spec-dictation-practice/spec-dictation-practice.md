@@ -29,7 +29,10 @@ sources: []
   - **success:** Both providers' recorded responses map to the same normalized sentence list `{index, text, startMs, endMs}`. Switching the config value changes the provider used by the next run.
 - **CAP-3**
   - **intent:** Ingestion tolerates failure: each item tracks its own status, transient errors are retried, and the job resumes after a restart.
-  - **success:** A failing item is marked failed with a reason while other items complete. Stopping and restarting the app continues pending transcriptions without resubmitting them.
+  - **success:**
+    - A failing item is marked failed while other items complete. The failure detail is logged, not stored.
+    - A failed item is not run again on later app starts; a retry feature is deferred.
+    - Stopping and restarting the app continues pending transcriptions without resubmitting them.
 - **CAP-4**
   - **intent:** The learner can browse practice items page by page.
   - **success:** The backend returns a requested page and page size with the total count, and the UI moves between pages.
@@ -56,7 +59,7 @@ sources: []
   - Tatoeba attribution is shown.
 - The BBC audio sent to transcription is the same file that is played: the static `…_download.mp3` from the episode page, never the RSS enclosure. The enclosure has ad insertion and expiring URLs.
 - Sentence playback seeks within the original audio file, which both audio hosts allow via HTTP range requests. No server-side audio cutting.
-- Provider API keys come from configuration or secrets, never from source code.
+- Provider API keys are read from appsettings, set in the gitignored `appsettings.Local.json`, and never committed.
 - Stay within the free tiers:
   - AssemblyAI: 5 concurrent jobs and 60 status polls per minute per transcript.
   - Gladia: 3 concurrent jobs.
@@ -91,5 +94,4 @@ sources: []
 
 ## Open Questions
 
-- How often does the import job run (e.g. once at startup, hourly, daily)?
 - AssemblyAI `language_code`: `en` or `en_us`? Confirm with the first call.
