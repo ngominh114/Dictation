@@ -1,0 +1,115 @@
+# ---- .NET build output ----
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]64/
+artifacts/
+publish/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+
+# ---- Tests / coverage ----
+[Tt]est[Rr]esult*/
+*.trx
+coverage/
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+
+# ---- IDEs ----
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userprefs
+*.sln.docstates
+*.DotSettings.user
+
+# ---- Secrets & local config (API keys for AssemblyAI / Gladia) ----
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+appsettings.Local.json
+secrets.json
+*.pfx
+
+# ---- Local data ----
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+data/
+audio-cache/
+
+# ---- Front-end (if a JS UI is added) ----
+**/node_modules/
+dist/
+.angular/
+.next/
+
+# ---- Dependencies, caches, logs, OS files ----
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+docs-site/.astro/
+docs-site/dist/
+/dogfood.toml
+
+# ---- AI assistant tools and BMad installs: per-machine, never committed ----
+.agent
+.agents
+.agentvibes
+.ai/
+.analysis/
+.augment
+.claude
+.clinerules
+.codebuddy
+.codex
+.crush
+.cursor
+.gemini
+.github/agents
+.github/chatmodes
+.iflow
+.junie
+.kilocodemodes
+.kiro
+.mcp.json
+.opencode
+.qwen
+.roo
+.rovodev
+.serena/
+.trae
+.windsurf
+CLAUDE.local.md
+skills-lock.json
+
+# ---- BMad: share team config + planning outputs, keep installs per-machine ----
+# Installer-managed files: each teammate runs the BMad installer locally.
+/_bmad/*
+# Team overrides (committed, everyone inherits on pull).
+!/_bmad/custom/
+# Personal overrides and install answers (never committed).
+*.user.toml
+# _bmad-output/ (research, spec, architecture, stories) and its .memlog.md files
+# are committed: the memlog is what BMad skills resume from when a teammate
+# updates an artifact.
