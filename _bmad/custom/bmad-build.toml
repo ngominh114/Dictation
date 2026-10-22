@@ -1,0 +1,38 @@
+# Team override for bmad-build (committed; applies to every developer).
+# Working style: test-driven development with two isolated agents.
+
+[workflow]
+
+persistent_facts = [
+  "Working style is TDD with two isolated agents: a test agent writes the test plan and the failing tests first; a separate implementation agent, with no knowledge of the tests, then implements the feature from the spec. Tests written in the test phase are never edited by the implementation agent.",
+]
+
+implementation_handoff = """
+Run the implementation as TDD in three phases. Do not merge phases or reuse an agent across them.
+
+**Phase 1 — Test agent (red).** Launch a subagent with no prior conversation context, with this prompt:
+
+> Read {spec_file} fully, and every file listed in its frontmatter `context:`. You are the test author; you do not implement the feature.
+>
+> 1. Write a test plan to `<spec file name without .md>-test-plan.md`, next to {spec_file}. Map every acceptance criterion and I/O matrix row to one or more named test cases (unit, adapter-with-recorded-fixture, or API integration, per the architecture's testing rule). Mark anything that can only be verified manually, such as browser audio behaviour, as `manual` with steps.
+> 2. Implement those tests under `tests/`. When a type or member the tests need does not exist yet, create only its public signature in `src/` (interface, record, or a method body that throws `NotImplementedException`), named as the spec and architecture name it, so the solution compiles. Write no real logic in `src/`.
+> 3. Run `dotnet build` and `dotnet test`. Every new test must compile and fail for the expected reason (not-implemented or a wrong result), never because of a build error.
+>
+> Report: the test plan path, the list of test files, and the red test run summary.
+
+After Phase 1, commit nothing, but record the test baseline: write a hash of every file under `tests/` (for example the output of `git hash-object` per file) to a uniquely named file in the system temp directory, as `{test_snapshot}`.
+
+**Phase 2 — Implementation agent (green).** Launch a NEW subagent with no prior conversation context and no knowledge of Phase 1, with this prompt:
+
+> Read {spec_file} fully and implement it. The spec is the sole source of truth. Load every file listed in its frontmatter `context:` before you start.
+>
+> Rules: do not open, read, or modify anything under `tests/` and do not read any `*-test-plan.md` file. Signatures already present in `src/` (methods that throw `NotImplementedException`) are yours to implement. Keep their names and signatures unless the spec contradicts them. Verify only by running `dotnet build` and `dotnet test` and reading their console output. Iterate until the build is clean and all tests pass, or until you are sure a remaining failure is caused by a test rather than by your code.
+>
+> When done, report what you changed, the final test run summary, any test you believe is wrong (by name, with the spec line it contradicts), and anything left incomplete or risky.
+
+**Phase 3 — Verify (you, the parent).**
+- Recompute the hashes for `tests/` and compare them with `{test_snapshot}`. Any change to a test file made in Phase 2 is a violation: revert it, and send the failure back to the Phase 2 agent.
+- Run `dotnet test` yourself. If tests still fail, re-engage the Phase 2 agent with the failing test names and output only, up to 3 rounds.
+- If the Phase 2 agent reports a test as wrong, or failures persist after 3 rounds, judge against the spec. When the test is wrong, re-engage a Phase 1-style test agent to fix only that test, then return to Phase 2. When the spec is ambiguous, HALT and ask the human.
+- Proceed to acceptance verification only when the build is clean and every test passes. Report manual test cases from the test plan to the human at presentation time.
+"""
