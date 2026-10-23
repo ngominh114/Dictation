@@ -44,9 +44,6 @@ namespace Dictation.Infrastructure.Persistence.Migrations
                     AudioUrl = table.Column<string>(type: "TEXT", nullable: false),
                     StartMs = table.Column<int>(type: "INTEGER", nullable: false),
                     EndMs = table.Column<int>(type: "INTEGER", nullable: true),
-                    AttributionAuthor = table.Column<string>(type: "TEXT", nullable: true),
-                    AttributionLicense = table.Column<string>(type: "TEXT", nullable: true),
-                    AttributionUrl = table.Column<string>(type: "TEXT", nullable: true),
                     Source = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>

@@ -1,4 +1,4 @@
-using Dictation.Core.Lessons;
+using Dictation.Domain.Lessons;
 
 namespace Dictation.Tests.Support;
 
@@ -15,5 +15,5 @@ public static class TestLessons
             createdAt: new DateTime(2026, 10, 22, 8, 30, 15, DateTimeKind.Utc));
 
     public static Segment AddSentence(this Lesson lesson, string? externalKey) =>
-        lesson.AddSegment(externalKey, "A sentence.", "https://example.test/audio.mp3", startMs: 0, endMs: null, attribution: null);
+        lesson.AddSegment(externalKey, "A sentence.", "https://example.test/audio.mp3", startMs: 0, endMs: null);
 }

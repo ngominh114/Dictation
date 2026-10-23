@@ -4,7 +4,7 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
 
 ## All adapters
 
-- Provider DTOs are `internal` to `Infrastructure` and mapped to `Core` types inside the adapter.
+- Provider DTOs are `internal` to `Infrastructure` and mapped to `Domain` types inside the adapter.
 - Throw only `ProviderException(FailureKind, message)`. Convert every `HttpRequestException`, non-caller `TaskCanceledException`, `JsonException`, `TimeoutRejectedException`, `BrokenCircuitException` and unexpected status code (kinds per AD-5).
 - Never send a request to an audio URL (no `GET`, `HEAD` or stream). Never call a provider upload endpoint.
 - Declare a constant lowercase key (`bbc`, `tatoeba`, `assemblyai`, `gladia`).
@@ -31,7 +31,6 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
   - `DraftSentence.ExternalKey` = `{sentenceId}:{audioId}`. Exclude known keys **before** grouping.
   - Groups of `Sources:Tatoeba:GroupSize` (default 10). A trailing partial group is not created.
   - `ExternalId` = the group's sentence IDs in order, comma-joined, no spaces.
-- **Attribution:** `{ Author, License, Url }` from `author`, `license` and `attribution_url`.
 
 ## AssemblyAI — `AssemblyAiTranscriptionProvider` (key `assemblyai`)
 

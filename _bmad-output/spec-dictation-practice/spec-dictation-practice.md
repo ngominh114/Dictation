@@ -22,7 +22,7 @@ sources: []
   - **intent:** A background job imports new content from every configured source provider (BBC 6 Minute English, Tatoeba) and turns it into practice items of ordered sentences, each with its own audio range.
   - **success:**
     - After a job run, each new BBC episode is an item whose sentences each have text, start ms and end ms.
-    - Each new Tatoeba item holds N sentences with their own clip and stored attribution (author, licence, link). Clips with an empty or disallowed licence are never stored.
+    - Each new Tatoeba item holds N sentences with their own clip. Clips with an empty or disallowed licence are never stored.
     - A second run adds no duplicates.
 - **CAP-2**
   - **intent:** The transcription provider can be swapped by configuration, with AssemblyAI as the default and Gladia as the alternative, without changing the sentence output.
@@ -38,7 +38,7 @@ sources: []
   - **success:** The backend returns a requested page and page size with the total count, and the UI moves between pages.
 - **CAP-5**
   - **intent:** The learner can practise one item sentence by sentence: play the current sentence, replay it, and go to the next or previous sentence.
-  - **success:** Each action plays exactly the current sentence's audio range and no neighbouring audio. Next and Previous stop at the first and last sentence. Tatoeba items show the clip attribution.
+  - **success:** Each action plays exactly the current sentence's audio range and no neighbouring audio. Next and Previous stop at the first and last sentence.
 - **CAP-6**
   - **intent:** Language is carried as data through sources, transcription and storage, with only English enabled.
   - **success:** Enabling another language requires configuration and, where needed, a new source adapter. No schema change and no edits to existing English code paths.
@@ -56,7 +56,6 @@ sources: []
 - Personal, single-user, non-commercial use only. BBC terms allow personal use; most Tatoeba audio is CC BY-NC-ND. So:
   - no public re-hosting or redistribution of audio;
   - no modifying the audio;
-  - Tatoeba attribution is shown.
 - The BBC audio sent to transcription is the same file that is played: the static `…_download.mp3` from the episode page, never the RSS enclosure. The enclosure has ad insertion and expiring URLs.
 - Sentence playback seeks within the original audio file, which both audio hosts allow via HTTP range requests. No server-side audio cutting.
 - Provider API keys are read from appsettings, set in the gitignored `appsettings.Local.json`, and never committed.

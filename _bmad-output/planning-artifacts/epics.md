@@ -24,7 +24,7 @@ This document provides the complete epic and story breakdown for Dictation Pract
 
 - **FR1:** On each app start, a background job imports new content from every registered source provider (BBC 6 Minute English, Tatoeba) and turns it into practice items (lessons) of ordered sentences. *(CAP-1)*
 - **FR2:** Each new BBC episode becomes a lesson whose sentences each have text, start ms and end ms, produced by a transcription provider from the episode's static `_download.mp3`. *(CAP-1)*
-- **FR3:** Each new Tatoeba lesson groups N sentences (default 10). Each sentence has its own audio clip and stored attribution (author, licence, link). Clips with an empty or disallowed licence are never stored. *(CAP-1)*
+- **FR3:** Each new Tatoeba lesson groups N sentences (default 10). Each sentence has its own audio clip. Clips with an empty or disallowed licence are never stored. *(CAP-1)*
 - **FR4:** A second import run adds no duplicate lessons and no duplicate Tatoeba sentences. *(CAP-1)*
 - **FR5:** Each run imports at most 5 new entries per source (configurable). *(spec constraint)*
 - **FR6:** The transcription provider is chosen by configuration: AssemblyAI (default) or Gladia, both behind `ITranscriptionProvider`. Both produce the same normalized sentence list `{index, text, startMs, endMs}`. Switching the config changes the provider for new submissions. *(CAP-2)*
@@ -33,7 +33,6 @@ This document provides the complete epic and story breakdown for Dictation Pract
 - **FR9:** Stopping and restarting the app continues interrupted work. A transcription in progress is polled again and never resubmitted. *(CAP-3)*
 - **FR10:** The learner can browse `Ready` lessons page by page. The backend returns the requested page and page size with the total count, and the UI moves between pages. *(CAP-4)*
 - **FR11:** The learner can open a lesson and play the current sentence, replay it, and go to the next or previous sentence. Each action plays exactly that sentence's audio range. Next and previous stop at the first and last sentence. *(CAP-5)*
-- **FR12:** Tatoeba lessons show the attribution of each clip in the player. *(CAP-5)*
 - **FR13:** The learner can reveal the full transcript of the current lesson with a button. It is hidden by default and shows every sentence in order. The text matches the played audio. *(CAP-7)*
 - **FR15:** When a lesson opens, the player preloads its audio from the source URL. If loading fails, it shows a clear error message with a Retry button. A BBC failure blocks the lesson; a Tatoeba clip failure blocks only that sentence. *(AD-9, web-contract)*
 
@@ -53,14 +52,14 @@ This document provides the complete epic and story breakdown for Dictation Pract
 ### Additional Requirements
 
 **Starter / project setup (affects Epic 1 Story 1):**
-- No third-party starter template. Create a solution with `Dictation.Core`, `Dictation.Infrastructure`, `Dictation.Api` (Minimal API host + `wwwroot`) and `Dictation.Tests` (xunit.v3).
+- No third-party starter template. Create a solution with `Dictation.Domain`, `Dictation.Application`, `Dictation.Infrastructure`, `Dictation.Api` (Minimal API host + `wwwroot`) and `Dictation.Tests` (xunit.v3).
 - Dependency direction per AD-1, enforced by an architecture test.
 - Pinned packages: EF Core SQLite 10.0.13, Http.Resilience 10.11.0, xunit.v3 4.0.2 (confirm it works with `Mvc.Testing` 10, otherwise use 3.2.2), Mvc.Testing 10.0.13.
 
 **Architecture rules that shape stories:**
 - **AD-1:** sources and transcription providers plug in by lowercase string key. `ImportService` uses all registered sources.
 - **AD-2:** `IContentSource` returns two draft kinds: transcribable (BBC) and ready (Tatoeba). `ITranscriptionProvider` exposes Submit, GetStatus and GetSentences. Adapters throw only `ProviderException(FailureKind, message)`.
-- **AD-3:** one segment shape for all sources, with a 0-based index assigned by `Lesson`. `EndMs` is exclusive. Attribution is an owned type.
+- **AD-3:** one segment shape for all sources, with a 0-based index assigned by `Lesson`. `EndMs` is exclusive.
 - **AD-4:** `Status` changes only through `Lesson` methods called by `ImportService`. Segments are written in the same save as `Ready`.
 - **AD-5:** failure kinds are Transient, Permanent and Configuration. Retries happen within one run only, then the lesson is `Failed`. Time bounds: 30 min transcription, 30 min pending, 60 min run. Submit is never retried (`DisableForUnsafeHttpMethods`).
 - **AD-6:** known keys are passed to sources. Unique indexes on `(Source, ExternalId)` and `(Source, Segment.ExternalKey)`.
@@ -85,7 +84,7 @@ No UX design document. UI behaviour (pages, player, preload, error messages) is 
 
 - **FR1:** Epic 1 (import framework, Tatoeba source); Epic 2 (BBC source)
 - **FR2:** Epic 2 — BBC episodes transcribed into timed sentences
-- **FR3:** Epic 1 — Tatoeba groups, clips, attribution, licence filter
+- **FR3:** Epic 1 — Tatoeba groups, clips, licence filter
 - **FR4:** Epic 1 (lesson + Tatoeba sentence dedup); Epic 2 (BBC guid dedup)
 - **FR5:** Epic 1 — `Import:MaxPerSource` cap (applies to BBC unchanged)
 - **FR6:** Epic 2 — AssemblyAI default (Story 2.2), Gladia alternative switchable by config (Story 2.4)
@@ -94,7 +93,6 @@ No UX design document. UI behaviour (pages, player, preload, error messages) is 
 - **FR9:** Epic 2 — resume interrupted work without resubmitting
 - **FR10:** Epic 1 — paginated lesson list
 - **FR11:** Epic 1 (clips); Epic 2 (time ranges within one MP3, same `playSegment`)
-- **FR12:** Epic 1 — attribution in the player
 - **FR13:** Epic 1 — transcript endpoint + reveal button
 - **FR15:** Epic 1 (preload + per-clip errors); Epic 2 (BBC whole-lesson error)
 
@@ -102,9 +100,9 @@ No UX design document. UI behaviour (pages, player, preload, error messages) is 
 
 ### Epic 1: Practise dictation with real sentences (Tatoeba)
 
-The learner opens the app, browses a paginated list of practice lessons built from native-speaker Tatoeba sentences, and practises each one sentence by sentence. Play, replay, next and previous are available, along with the clip attribution and a button that reveals the transcript. Audio is preloaded, with clear errors. This epic also lays down the solution skeleton, the import framework, storage and the REST API that Epic 2 builds on. It needs no API key.
+The learner opens the app, browses a paginated list of practice lessons built from native-speaker Tatoeba sentences, and practises each one sentence by sentence. Play, replay, next and previous are available, along with a button that reveals the transcript. Audio is preloaded, with clear errors. This epic also lays down the solution skeleton, the import framework, storage and the REST API that Epic 2 builds on. It needs no API key.
 
-**FRs covered:** FR1, FR3, FR4, FR5, FR7, FR10, FR11, FR12, FR13, FR15
+**FRs covered:** FR1, FR3, FR4, FR5, FR7, FR10, FR11, FR13, FR15
 
 ### Epic 2: Practise with BBC 6 Minute English episodes
 
@@ -127,7 +125,7 @@ So that every later story builds on the agreed structure.
 **Given** a fresh clone
 **When** I run `dotnet run --project src/Dictation.Api`
 **Then** the API starts on localhost, applies EF migrations to a SQLite file before serving, and serves `wwwroot/index.html`
-**And** the solution has `Dictation.Core`, `Dictation.Infrastructure`, `Dictation.Api` and `Dictation.Tests`, with the package versions from the architecture spine
+**And** the solution has `Dictation.Domain`, `Dictation.Application`, `Dictation.Infrastructure`, `Dictation.Api` and `Dictation.Tests`, with the package versions from the architecture spine
 
 **Given** the `Lesson` and `Segment` model (AD-3, AD-4)
 **When** the migration runs
@@ -149,7 +147,7 @@ So that I have something to practise without any setup.
 
 **Given** the app starts with `Import:Enabled=true`
 **When** the import runs
-**Then** up to `Import:MaxPerSource` (5) new Tatoeba lessons of `GroupSize` (10) sentences are saved as `Ready`, each sentence with its clip URL and attribution (rules in `adapter-rules.md`)
+**Then** up to `Import:MaxPerSource` (5) new Tatoeba lessons of `GroupSize` (10) sentences are saved as `Ready`, each sentence with its clip URL (rules in `adapter-rules.md`)
 
 **Given** clips with an empty or disallowed licence
 **When** the import runs
@@ -193,10 +191,6 @@ So that I can practise dictation one sentence at a time and check what I heard.
 **When** I press play, replay, next or previous
 **Then** exactly the current sentence plays: from `startMs` to `endMs`, or to the end of the clip when there is no `endMs`
 **And** next and previous stop at the first and last sentence, and the UI shows "sentence N of M"
-
-**Given** a Tatoeba sentence
-**When** it is shown
-**Then** its attribution (author, licence, link) is displayed
 
 **Given** audio fails to load or takes longer than 20 s
 **When** the player detects it
@@ -307,4 +301,4 @@ So that the provider can be changed without touching the rest of the app.
 **When** the app starts
 **Then** it is a configuration error with one clear log, and Tatoeba import still works
 
-**And** the Gladia adapter passes the same shared transcription contract test as AssemblyAI, using recorded Gladia responses, and adding it required no change to `Core`, storage, API or UI
+**And** the Gladia adapter passes the same shared transcription contract test as AssemblyAI, using recorded Gladia responses, and adding it required no change to `Domain`, `Application`, storage, API or UI

@@ -1,4 +1,4 @@
-using Dictation.Core.Lessons;
+using Dictation.Domain.Lessons;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -50,13 +50,6 @@ internal sealed class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             segment.Property(s => s.AudioUrl).IsRequired();
             segment.Property(s => s.StartMs).IsRequired();
             segment.Property(s => s.EndMs);
-
-            segment.OwnsOne(s => s.Attribution, attribution =>
-            {
-                attribution.Property(a => a.Author).HasColumnName("AttributionAuthor").IsRequired();
-                attribution.Property(a => a.License).HasColumnName("AttributionLicense").IsRequired();
-                attribution.Property(a => a.Url).HasColumnName("AttributionUrl").IsRequired();
-            });
 
             segment.HasIndex(s => new { s.Source, s.ExternalKey })
                 .IsUnique()

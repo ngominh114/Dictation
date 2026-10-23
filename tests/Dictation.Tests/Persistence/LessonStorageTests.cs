@@ -1,4 +1,4 @@
-using Dictation.Core.Lessons;
+using Dictation.Domain.Lessons;
 using Dictation.Tests.Support;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,9 +39,8 @@ public sealed class LessonStorageTests : IAsyncLifetime
     public async Task Lesson_and_segments_round_trip_in_index_order()
     {
         var lesson = TestLessons.Create();
-        lesson.AddSegment("11:110", "First sentence.", "https://example.test/110.mp3", 0, null,
-            new Attribution("author-a", "CC BY 4.0", "https://example.test/author-a"));
-        lesson.AddSegment(null, "Second sentence.", "https://example.test/episode.mp3", 1500, 4200, null);
+        lesson.AddSegment("11:110", "First sentence.", "https://example.test/110.mp3", 0, null);
+        lesson.AddSegment(null, "Second sentence.", "https://example.test/episode.mp3", 1500, 4200);
         await SaveAsync(lesson);
 
         await using var db = database.CreateContext();
@@ -57,13 +56,11 @@ public sealed class LessonStorageTests : IAsyncLifetime
                 Assert.Equal(0, first.Index);
                 Assert.Equal("First sentence.", first.Text);
                 Assert.Null(first.EndMs);
-                Assert.Equal("CC BY 4.0", first.Attribution?.License);
             },
             second =>
             {
                 Assert.Equal(1, second.Index);
                 Assert.Equal((1500, 4200), (second.StartMs, second.EndMs));
-                Assert.Null(second.Attribution);
             });
     }
 

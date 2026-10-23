@@ -1,7 +1,7 @@
-using Dictation.Core.Lessons;
+using Dictation.Domain.Lessons;
 using Dictation.Tests.Support;
 
-namespace Dictation.Tests.Core;
+namespace Dictation.Tests.Domain;
 
 public sealed class LessonTests
 {

@@ -14,7 +14,7 @@ The tests cover the main business only: lessons and their sentences are stored c
 | Test | Covers |
 |---|---|
 | `LessonTests.AddSegment_assigns_sequential_zero_based_indexes` | `Index` is 0-based and assigned only by `Lesson` |
-| `LessonStorageTests.Lesson_and_segments_round_trip_in_index_order` | Matrix: round trip (attribution, `EndMs = null`, UTC dates, index order) |
+| `LessonStorageTests.Lesson_and_segments_round_trip_in_index_order` | Matrix: round trip (`EndMs = null`, UTC dates, index order) |
 | `LessonStorageTests.The_same_lesson_cannot_be_imported_twice_from_a_source` | Matrix: duplicate lesson; the same `ExternalId` under another source is allowed |
 | `LessonStorageTests.The_same_sentence_cannot_be_imported_twice_from_a_source` | Matrix: duplicate segment key |
 | `LessonStorageTests.Sentences_without_a_key_never_conflict` | Matrix: null segment keys |

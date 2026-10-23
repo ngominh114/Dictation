@@ -1,4 +1,4 @@
-namespace Dictation.Core.Lessons;
+namespace Dictation.Domain.Lessons;
 
 /// <summary>One sentence of a lesson. <see cref="Index"/> is 0-based and assigned only by <see cref="Lesson"/>.</summary>
 public sealed class Segment
@@ -10,8 +10,7 @@ public sealed class Segment
         string text,
         string audioUrl,
         int startMs,
-        int? endMs,
-        Attribution? attribution)
+        int? endMs)
     {
         Source = source;
         Index = index;
@@ -20,7 +19,6 @@ public sealed class Segment
         AudioUrl = audioUrl;
         StartMs = startMs;
         EndMs = endMs;
-        Attribution = attribution;
     }
 
     // Used by EF Core materialization.
@@ -40,8 +38,6 @@ public sealed class Segment
 
     /// <summary>Exclusive end; null means play to the end of the clip.</summary>
     public int? EndMs { get; private set; }
-
-    public Attribution? Attribution { get; private set; }
 
     /// <summary>
     /// Denormalized copy of the owning lesson's <see cref="Lesson.Source"/>, so that

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dictation.Core\Dictation.Core.csproj" />
+    <ProjectReference Include="..\Dictation.Application\Dictation.Application.csproj" />
   </ItemGroup>
 
 </Project>

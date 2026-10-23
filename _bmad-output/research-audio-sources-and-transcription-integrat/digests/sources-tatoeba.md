@@ -13,7 +13,7 @@ API formats: see the main report, section 2.
    - Most English audio is `CC BY-NC-ND 3.0`, which is acceptable for personal, non-commercial use.
 4. **Build the audio URL from the id:** `https://api.tatoeba.org/v1/audios/{audio.id}/file`.
    - Do not use `download_url`; it returns 404.
-5. **Store attribution per clip** (`author`, `license`, `attribution_url`) and show it in the UI.
+5. **Attribution is not stored** (personal use only); the licence is used only to filter clips.
 6. **Group N sentences (e.g. 10) into one practice item.** Each sentence becomes one segment with its own clip URL. No transcription is needed.
 7. **Deduplicate** on sentence `id` + audio `id`.
 

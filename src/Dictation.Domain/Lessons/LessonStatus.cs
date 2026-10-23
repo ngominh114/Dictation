@@ -1,4 +1,4 @@
-namespace Dictation.Core.Lessons;
+namespace Dictation.Domain.Lessons;
 
 public enum LessonStatus
 {

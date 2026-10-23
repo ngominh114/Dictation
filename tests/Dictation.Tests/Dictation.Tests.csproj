@@ -23,7 +23,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Dictation.Api\Dictation.Api.csproj" />
     <ProjectReference Include="..\..\src\Dictation.Infrastructure\Dictation.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\Dictation.Core\Dictation.Core.csproj" />
+    <ProjectReference Include="..\..\src\Dictation.Application\Dictation.Application.csproj" />
+    <ProjectReference Include="..\..\src\Dictation.Domain\Dictation.Domain.csproj" />
   </ItemGroup>
 
 </Project>

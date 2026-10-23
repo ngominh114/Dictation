@@ -9,13 +9,12 @@ Only `Ready` lessons are exposed. A missing or non-`Ready` id returns 404 `Probl
 | Endpoint | Returns |
 | --- | --- |
 | `GET /api/lessons?page&pageSize` | `{ items: [{ id, title, source, language, segmentCount, createdAt }], page, pageSize, totalCount }` |
-| `GET /api/lessons/{id}` | `{ id, title, source, language, sourceUrl, segments: [{ index, audioUrl, startMs, endMs?, attribution? }] }` (no text) |
+| `GET /api/lessons/{id}` | `{ id, title, source, language, sourceUrl, segments: [{ index, audioUrl, startMs, endMs? }] }` (no text) |
 | `GET /api/lessons/{id}/transcript` | `[{ index, text }]` |
 
 - **Paging:** `page` is 1-based (default 1). `pageSize` defaults to 20, range 1–100; out of range → 400 `ProblemDetails`.
 - **Order:** `createdAt DESC, id DESC`.
 - **Segments:** sorted by `index` ascending.
-- **Attribution:** `{ author, license, url }`, omitted when null.
 
 ## Pages
 

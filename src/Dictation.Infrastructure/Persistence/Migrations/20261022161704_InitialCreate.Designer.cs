@@ -20,7 +20,7 @@ namespace Dictation.Infrastructure.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
-            modelBuilder.Entity("Dictation.Core.Lessons.Lesson", b =>
+            modelBuilder.Entity("Dictation.Domain.Lessons.Lesson", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
@@ -72,9 +72,9 @@ namespace Dictation.Infrastructure.Persistence.Migrations
                     b.ToTable("Lessons", (string)null);
                 });
 
-            modelBuilder.Entity("Dictation.Core.Lessons.Lesson", b =>
+            modelBuilder.Entity("Dictation.Domain.Lessons.Lesson", b =>
                 {
-                    b.OwnsMany("Dictation.Core.Lessons.Segment", "Segments", b1 =>
+                    b.OwnsMany("Dictation.Domain.Lessons.Segment", "Segments", b1 =>
                         {
                             b1.Property<Guid>("LessonId")
                                 .HasColumnType("TEXT");
@@ -113,39 +113,6 @@ namespace Dictation.Infrastructure.Persistence.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("LessonId");
-
-                            b1.OwnsOne("Dictation.Core.Lessons.Attribution", "Attribution", b2 =>
-                                {
-                                    b2.Property<Guid>("SegmentLessonId")
-                                        .HasColumnType("TEXT");
-
-                                    b2.Property<int>("SegmentIndex")
-                                        .HasColumnType("INTEGER");
-
-                                    b2.Property<string>("Author")
-                                        .IsRequired()
-                                        .HasColumnType("TEXT")
-                                        .HasColumnName("AttributionAuthor");
-
-                                    b2.Property<string>("License")
-                                        .IsRequired()
-                                        .HasColumnType("TEXT")
-                                        .HasColumnName("AttributionLicense");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasColumnType("TEXT")
-                                        .HasColumnName("AttributionUrl");
-
-                                    b2.HasKey("SegmentLessonId", "SegmentIndex");
-
-                                    b2.ToTable("Segments");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("SegmentLessonId", "SegmentIndex");
-                                });
-
-                            b1.Navigation("Attribution");
                         });
 
                     b.Navigation("Segments");

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Dictation.Core/Dictation.Core.csproj" />
+    <Project Path="src/Dictation.Domain/Dictation.Domain.csproj" />
+    <Project Path="src/Dictation.Application/Dictation.Application.csproj" />
     <Project Path="src/Dictation.Infrastructure/Dictation.Infrastructure.csproj" />
     <Project Path="src/Dictation.Api/Dictation.Api.csproj" />
   </Folder>

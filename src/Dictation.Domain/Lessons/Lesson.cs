@@ -1,4 +1,4 @@
-namespace Dictation.Core.Lessons;
+namespace Dictation.Domain.Lessons;
 
 public sealed class Lesson
 {
@@ -74,14 +74,13 @@ public sealed class Lesson
         string text,
         string audioUrl,
         int startMs,
-        int? endMs,
-        Attribution? attribution)
+        int? endMs)
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(audioUrl);
 
         var index = _segments.Count == 0 ? 0 : _segments.Max(s => s.Index) + 1;
-        var segment = new Segment(Source, index, externalKey, text, audioUrl, startMs, endMs, attribution);
+        var segment = new Segment(Source, index, externalKey, text, audioUrl, startMs, endMs);
         _segments.Add(segment);
         return segment;
     }

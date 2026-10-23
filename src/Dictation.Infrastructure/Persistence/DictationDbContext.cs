@@ -1,4 +1,4 @@
-using Dictation.Core.Lessons;
+using Dictation.Domain.Lessons;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dictation.Infrastructure.Persistence;

@@ -23,20 +23,22 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 
 ## Design Paradigm
 
-**Ports & Adapters, kept small.** Use cases are plain services; there is no MediatR or CQRS framework.
+**Ports & Adapters with Domain and Application layers (Clean Architecture style), kept small.** Use cases are plain services; there is no MediatR or CQRS framework.
 
 | Project | Holds |
 | --- | --- |
-| `Dictation.Core` | `Lesson`, `Segment`, `Attribution`, `ImportService`, `LessonQueryService`, ports, `ProviderException` |
+| `Dictation.Domain` | `Lesson`, `Segment`, `LessonStatus` and their rules; no package references |
+| `Dictation.Application` | Use cases (`ImportService`, `LessonQueryService`), ports (`IContentSource`, `ITranscriptionProvider`, repository), `ProviderException`, options |
 | `Dictation.Infrastructure` | BBC, Tatoeba, AssemblyAI and Gladia adapters; EF Core `DbContext` and repository; provider DTOs |
 | `Dictation.Api` | `Program.cs`, Minimal API endpoints, `ImportBackgroundService`, `wwwroot` UI |
-| `Dictation.Tests` | Core unit, adapter (recorded responses), API integration, architecture test |
+| `Dictation.Tests` | Domain and Application unit, adapter (recorded responses), API integration |
 
 ```mermaid
 graph LR
-  Api[Dictation.Api] --> Core[Dictation.Core]
+  Api[Dictation.Api] --> App[Dictation.Application]
   Api --> Infra[Dictation.Infrastructure]
-  Infra --> Core
+  Infra --> App
+  App --> Domain[Dictation.Domain]
   Tests[Dictation.Tests] --> Api
 ```
 
@@ -45,9 +47,9 @@ graph LR
 ### AD-1 — Dependencies point inward; providers plug in
 
 - **Binds:** all
-- **Prevents:** domain code depending on EF or HTTP; adding a provider requiring edits to `Core`.
+- **Prevents:** domain code depending on EF or HTTP; adding a provider requiring edits to `Domain` or `Application`.
 - **Rule:**
-  - `Core` references only `Microsoft.Extensions.*.Abstractions`. `Infrastructure` references only `Core`. Adapters never reference each other or the repository. An architecture test enforces this.
+  - `Domain` references nothing. `Application` references only `Domain` and `Microsoft.Extensions.*.Abstractions`. `Infrastructure` references only `Application` (and through it `Domain`). Adapters never reference each other or the repository. The project references enforce this.
   - Sources and transcription providers are identified by lowercase string keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`), not enums.
   - `ImportService` uses every registered `IContentSource`, and resolves `ITranscriptionProvider` by key.
   - Adding a provider = adapter + DI registration + config + fixtures.
@@ -55,11 +57,11 @@ graph LR
 ### AD-2 — Ports and drafts
 
 - **Binds:** CAP-1, CAP-2
-- **Prevents:** provider shapes leaking into `Core`; sources returning incompatible drafts.
+- **Prevents:** provider shapes leaking into `Domain` or `Application`; sources returning incompatible drafts.
 - **Rule:**
   - `IContentSource.DiscoverAsync(language, knownKeys, max)` returns `LessonDraft`s of exactly two kinds:
     - **transcribable** (BBC): `SourceAudioUrl` set, no sentences;
-    - **ready** (Tatoeba): `DraftSentence { ExternalKey, Text, AudioUrl, Attribution }` list, no `SourceAudioUrl`.
+    - **ready** (Tatoeba): `DraftSentence { ExternalKey, Text, AudioUrl }` list, no `SourceAudioUrl`.
   - `ITranscriptionProvider` exposes `SubmitAsync(audioUrl, language)`, `GetStatusAsync(jobId)` → `Pending | Completed`, and `GetSentencesAsync(jobId)` → ordered `TranscribedSentence { Text, StartMs, EndMs }`, plus `MaxConcurrentJobs`.
   - Adapters throw only `ProviderException(FailureKind, message)`. A provider `error` status is thrown, never returned.
 
@@ -68,12 +70,11 @@ graph LR
 - **Binds:** CAP-1, CAP-5
 - **Prevents:** the player branching on source; index clashes; sentences split or merged.
 - **Rule:**
-  - `Segment { Index, ExternalKey?, Text, AudioUrl, StartMs, EndMs?, Attribution? }`.
+  - `Segment { Index, ExternalKey?, Text, AudioUrl, StartMs, EndMs? }`.
   - `Index` is 0-based and assigned only by `Lesson`.
   - One sentence = one segment; nothing splits or merges sentences.
   - BBC: every segment uses the lesson's audio URL with its own `StartMs` and `EndMs`. Tatoeba: own clip, `StartMs = 0`, `EndMs = null` (play to end).
   - `EndMs` is exclusive; segments are ordered and non-overlapping.
-  - `Attribution { Author, License, Url }` is an EF owned type.
 
 ### AD-4 — Lesson lifecycle has one owner
 
@@ -117,7 +118,7 @@ graph LR
 - **Rule:**
   - `Program.cs` runs `MigrateAsync()` before `app.Run()`. `EnsureCreated` is never used. SQLite runs in WAL mode.
   - `ImportBackgroundService` (only when `Import:Enabled`) runs once per app start: discover, then poll every 10 s while work remains, with a new DI scope per lesson per tick.
-  - All logic lives in `Core.ImportService`. In-process hosting is a demo simplification; the ideal is a separate Worker host.
+  - All logic lives in `Application.ImportService`. In-process hosting is a demo simplification; the ideal is a separate Worker host.
 
 ### AD-8 — Transcription provider selection and concurrency
 
@@ -223,17 +224,15 @@ erDiagram
     string AudioUrl
     int StartMs
     int EndMs
-    string AttributionAuthor
-    string AttributionLicense
-    string AttributionUrl
   }
 ```
 
 ```text
-src/Dictation.Core/            # domain, ImportService, LessonQueryService, ports
+src/Dictation.Domain/          # Lessons/: Lesson, Segment, LessonStatus
+src/Dictation.Application/     # Import/: ImportService, ports, ProviderException, options; Lessons/: LessonQueryService
 src/Dictation.Infrastructure/  # Sources/*, Transcription/*, Persistence (EF + migrations)
 src/Dictation.Api/             # Program.cs, Endpoints/, ImportBackgroundService, wwwroot/
-tests/Dictation.Tests/         # Core/, Adapters/ + Fixtures/, Api/, ArchitectureTests
+tests/Dictation.Tests/         # Domain/, Application/, Persistence/, Adapters/ + Fixtures/, Api/
 ```
 
 Runs locally only (`dotnet run --project src/Dictation.Api`); the SQLite file is gitignored.
