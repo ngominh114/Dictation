@@ -4,6 +4,7 @@
 [workflow]
 
 persistent_facts = [
+  "No epics, stories or sprint tracking in this project. Always take the freeform path: never compile epic context, never resolve a story key, never read or write sprint-status.yaml. The source of truth is _bmad-output/spec-dictation-practice/spec-dictation-practice.md plus its companions (architecture-dictation-practice.md, adapter-rules.md, web-contract.md); list them in every new spec's `context:` frontmatter. The user names each slice of work to build; their corrections in conversation override these documents.",
   "Working style is TDD with two isolated agents: a test agent writes the test plan and the failing tests first; a separate implementation agent, with no knowledge of the tests, then implements the feature from the spec. Tests written in the test phase are never edited by the implementation agent.",
 ]
 

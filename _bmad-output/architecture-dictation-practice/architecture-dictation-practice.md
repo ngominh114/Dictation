@@ -3,11 +3,11 @@ name: 'Dictation Practice'
 type: architecture-spine
 purpose: build-substrate
 altitude: feature
-paradigm: 'Ports & Adapters (hexagonal), small'
+paradigm: 'Clean Architecture, small; Adapter pattern for external APIs; generic step pipeline for import'
 scope: 'Whole Dictation Practice app: content import, transcription, storage, REST API, web UI'
 status: final
 created: '2026-10-22'
-updated: '2026-10-22'
+updated: '2026-10-23'
 binds: [CAP-1, CAP-2, CAP-3, CAP-4, CAP-5, CAP-6, CAP-7]
 sources: []
 companions:
@@ -23,157 +23,120 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 
 ## Design Paradigm
 
-**Ports & Adapters with Domain and Application layers (Clean Architecture style), kept small.** Use cases are plain services; there is no MediatR or CQRS framework.
+**Clean Architecture, kept small.** Four layers (Domain, Application, Infrastructure, Api) with dependencies pointing inward. `Application` defines the interfaces it needs (`IContentSource`, `ITranscriptionProvider`, `ILessonRepository`). Each external API gets one **adapter** in `Infrastructure` (Adapter pattern) that implements the interface and translates that API's DTOs to domain types. Use cases are plain services; no MediatR or CQRS.
 
 | Project | Holds |
 | --- | --- |
-| `Dictation.Domain` | `Lesson`, `Segment`, `LessonStatus` and their rules; no package references |
-| `Dictation.Application` | Use cases (`ImportService`, `LessonQueryService`), ports (`IContentSource`, `ITranscriptionProvider`, repository), `ProviderException`, options |
-| `Dictation.Infrastructure` | BBC, Tatoeba, AssemblyAI and Gladia adapters; EF Core `DbContext` and repository; provider DTOs |
+| `Dictation.Domain` | `Lesson`, `Segment`, `LessonStatus`; no package references |
+| `Dictation.Application` | `Pipeline<T>` and `IPipelineStep<T>`; import (`ImportRunner`, `DiscoveryService`, `TranscribeStep`, `FinishStep`); `LessonQueryService`; interfaces for adapters and the repository; `ProviderException`; options |
+| `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; EF Core `DbContext` and repository |
 | `Dictation.Api` | `Program.cs`, Minimal API endpoints, `ImportBackgroundService`, `wwwroot` UI |
-| `Dictation.Tests` | Domain and Application unit, adapter (recorded responses), API integration |
+| `Dictation.Tests` | Unit, adapter (recorded responses) and API integration tests |
+
+**Import flow:**
 
 ```mermaid
 graph LR
-  Api[Dictation.Api] --> App[Dictation.Application]
-  Api --> Infra[Dictation.Infrastructure]
-  Infra --> App
-  App --> Domain[Dictation.Domain]
-  Tests[Dictation.Tests] --> Api
+  S[Sources] -->|new Lessons| D[Discovery]
+  D --> P[Pipeline: transcribe → finish]
+  P -->|segments| R[Ready]
+  P -->|nothing to practise| F[Failed]
 ```
 
-## Invariants & Rules
+## Rules
 
-### AD-1 — Dependencies point inward; providers plug in
+### AD-1 — Dependencies point inward; things plug in
 
-- **Binds:** all
-- **Prevents:** domain code depending on EF or HTTP; adding a provider requiring edits to `Domain` or `Application`.
-- **Rule:**
-  - `Domain` references nothing. `Application` references only `Domain` and `Microsoft.Extensions.*.Abstractions`. `Infrastructure` references only `Application` (and through it `Domain`). Adapters never reference each other or the repository. The project references enforce this.
-  - Sources and transcription providers are identified by lowercase string keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`), not enums.
-  - `ImportService` uses every registered `IContentSource`, and resolves `ITranscriptionProvider` by key.
-  - Adding a provider = adapter + DI registration + config + fixtures.
+- `Domain` references nothing. `Application` references only `Domain` and `Microsoft.Extensions.*.Abstractions`. `Infrastructure` references only `Application`. Adapters never reference each other or the repository. Project references enforce this.
+- Sources, providers and steps have constant lowercase keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`, `transcribe`, `finish`), not enums.
+- Add a source = adapter + DI registration + config + fixtures. Add a step = step + DI registration + one `Import:Pipeline:Steps` entry.
 
-### AD-2 — Ports and drafts
+### AD-2 — Sources return `Lesson`s
 
-- **Binds:** CAP-1, CAP-2
-- **Prevents:** provider shapes leaking into `Domain` or `Application`; sources returning incompatible drafts.
-- **Rule:**
-  - `IContentSource.DiscoverAsync(language, knownKeys, max)` returns `LessonDraft`s of exactly two kinds:
-    - **transcribable** (BBC): `SourceAudioUrl` set, no sentences;
-    - **ready** (Tatoeba): `DraftSentence { ExternalKey, Text, AudioUrl }` list, no `SourceAudioUrl`.
-  - `ITranscriptionProvider` exposes `SubmitAsync(audioUrl, language)`, `GetStatusAsync(jobId)` → `Pending | Completed`, and `GetSentencesAsync(jobId)` → ordered `TranscribedSentence { Text, StartMs, EndMs }`, plus `MaxConcurrentJobs`.
-  - Adapters throw only `ProviderException(FailureKind, message)`. A provider `error` status is thrown, never returned.
+- `IContentSource.DiscoverAsync(language, knownKeys, max, ct)` returns up to `Import:MaxPerSource` (5) **new** `Lesson`s. Known keys are passed so sources skip what is already stored.
+- Each adapter maps its own `internal` DTOs to a lesson with `Lesson.CreateDiscovered(...)` and `AddSegment(...)`, filling in whatever its source has (BBC: `SourceAudioUrl`; Tatoeba: segments).
+- One segment shape for every source: `Segment { Index, ExternalKey?, Text, AudioUrl, StartMs, EndMs? }`. `Index` is 0-based and assigned by `Lesson`. One sentence = one segment. `EndMs` is exclusive; `null` means play to the end of the clip.
+- Unique indexes on `(Source, ExternalId)` and `(Source, Segment.ExternalKey)`. A violation skips that lesson without failing the run.
+- `Lesson.Language` stores `en`. `DiscoveryService` iterates `Import:Languages` ∩ each source's `SupportedLanguages`; adapters map to their own codes.
 
-### AD-3 — One segment shape for every source
+### AD-3 — Import is discovery, then a pipeline of steps
 
-- **Binds:** CAP-1, CAP-5
-- **Prevents:** the player branching on source; index clashes; sentences split or merged.
-- **Rule:**
-  - `Segment { Index, ExternalKey?, Text, AudioUrl, StartMs, EndMs? }`.
-  - `Index` is 0-based and assigned only by `Lesson`.
-  - One sentence = one segment; nothing splits or merges sentences.
-  - BBC: every segment uses the lesson's audio URL with its own `StartMs` and `EndMs`. Tatoeba: own clip, `StartMs = 0`, `EndMs = null` (play to end).
-  - `EndMs` is exclusive; segments are ordered and non-overlapping.
+- The pipeline is generic and knows nothing about lessons:
 
-### AD-4 — Lesson lifecycle has one owner
+  ```csharp
+  public interface IPipelineStep<T>
+  {
+      string Name { get; }
+      /// <summary>Data-driven guard: skip this step when its work isn't needed for this item.</summary>
+      bool AppliesTo(T item);
+      Task<T> RunAsync(T item, CancellationToken ct);
+  }
+  ```
 
-- **Binds:** CAP-1, CAP-3
-- **Prevents:** two code paths changing `Status`; half-written lessons becoming visible.
-- **Rule:**
-  - `Status` changes only through `Lesson` methods (`CreateDiscovered`, `CreateReady`, `StartTranscription`, `Complete`, `Fail`), called only by `ImportService`. `ImportService` saves once after each call.
-  - Segments are an owned collection, written in the same save as the transition to `Ready`.
-  - `SourceAudioUrl`, `TranscriptionProvider`, `TranscriptionJobId` and `TranscriptionStartedAt` are persisted.
+  `Pipeline<T>` runs steps in order, skips those whose `AppliesTo` is false, and calls an after-step callback (`Func<T, CancellationToken, Task>`); the lesson host passes "save the lesson".
+- `AppliesTo` is pure: it reads only the item's own data, never `Source`, and does no I/O.
+- Steps run in the order of `Import:Pipeline:Steps` (default `["transcribe", "finish"]`). An unknown name fails startup; `finish` is last.
 
-### AD-5 — Failure handling: retry within one run, then permanently failed
-
-- **Binds:** CAP-1, CAP-3
-- **Prevents:** inconsistent retries; endless loops; double-billed submissions; lost transcripts.
-- **Rule:**
-
-  | `FailureKind` | Triggers | Effect |
+  | Step | Applies when (not `Ready`/`Failed`, and…) | Does |
   | --- | --- | --- |
-  | `Transient` | timeout, network, 408, 429, 5xx, open circuit, quota rejection | Retried only within the current run (resilience handler + next tick). |
-  | `Permanent` | no download link, provider error, empty transcript, 400/422 | `Fail()` at once. |
-  | `Configuration` | 401/403, missing key or config | That stage and provider are disabled for the run; lessons are untouched. |
+  | `transcribe` | `SourceAudioUrl` set, no segments | No job id: submit (if under the concurrency cap). Job id: poll; on completion add the segments. |
+  | `finish` | has segments, or has no `SourceAudioUrl` | Segments → `Complete()` (`Ready`). None → `Fail()`. |
 
-  - **`Failed` is permanent.** Never retried automatically. No reason is stored; the detail is logged.
-  - **The run gives up on a lesson** when: transcription exceeds 30 min (always poll first); transient errors persist beyond `Import:MaxPendingMinutes` (30); or the `Import:MaxRunMinutes` (60) deadline is reached.
-  - **A crash or stop is not a failure.** The next start resumes `Discovered` lessons (submit) and `Transcribing` lessons (poll the stored job, never resubmit).
-  - **Submit is never retried within a tick:** `Retry.DisableForUnsafeHttpMethods()`.
+- An unfinished lesson simply runs again next tick, so restart needs no resume code: a stored job id is polled, never resubmitted.
+- `ImportBackgroundService` (only when `Import:Enabled`) calls `ImportRunner.DiscoverAsync` once per app start, then `TickAsync` every 10 s while work remains, with a new DI scope per lesson. All logic lives in `Application`.
 
-### AD-6 — Idempotent import
+### AD-4 — Lessons change only through `Lesson` methods
 
-- **Binds:** CAP-1
-- **Prevents:** duplicate lessons or sentences; BBC stalling after the first run.
-- **Rule:**
-  - `ImportService` passes the known keys to each source, which returns up to `Import:MaxPerSource` (5) **new** drafts.
-  - Unique indexes on `(Source, ExternalId)` and `(Source, Segment.ExternalKey)`. A violation skips the draft without failing the run.
-  - The key format per source is in [adapter-rules.md](adapter-rules.md).
+- `CreateDiscovered` (sources), `StartTranscription`, `Complete`, `Fail` (steps). `Complete()` requires at least one segment.
+- Only `Ready` matters to the outside: it is the only status the API exposes, and `Ready`/`Failed` are never processed again. `Discovered`/`Transcribing` are kept for data consistency; no guard depends on them.
+- Saves: discovery saves each new lesson once; the pipeline saves after each executed step.
 
-### AD-7 — Host and startup
+### AD-5 — Failures: retry within one run, then permanently failed
 
-- **Binds:** CAP-1, CAP-3
-- **Prevents:** API requests racing schema creation; tests triggering live imports; import logic tied to one host.
-- **Rule:**
-  - `Program.cs` runs `MigrateAsync()` before `app.Run()`. `EnsureCreated` is never used. SQLite runs in WAL mode.
-  - `ImportBackgroundService` (only when `Import:Enabled`) runs once per app start: discover, then poll every 10 s while work remains, with a new DI scope per lesson per tick.
-  - All logic lives in `Application.ImportService`. In-process hosting is a demo simplification; the ideal is a separate Worker host.
+| `FailureKind` | Triggers | Effect |
+| --- | --- | --- |
+| `Transient` | timeout, network, 408, 429, 5xx, open circuit, quota rejection | Change not saved; retried next tick within this run. |
+| `Permanent` | provider error, empty transcript, 400/422 | `Fail()`. |
+| `Configuration` | 401/403, missing key or config | That step is disabled for the run; lessons untouched. |
 
-### AD-8 — Transcription provider selection and concurrency
+- Adapters throw only `ProviderException(FailureKind, message)`. Any other exception from a step is logged and treated as `Transient`; none escapes one lesson.
+- `Failed` is permanent; the detail is logged, not stored.
+- Limits: transcription 30 min (step polls first), transient errors `Import:MaxPendingMinutes` (30), run `Import:MaxRunMinutes` (60). Past a limit the lesson is `Failed`.
+- Submit is never auto-retried (`Retry.DisableForUnsafeHttpMethods()`).
 
-- **Binds:** CAP-2
-- **Prevents:** polling a job on the wrong provider; exceeding free-tier limits.
-- **Rule:**
-  - `Transcription:Provider` picks the provider for new submissions only. Each lesson stores its provider key, and polling uses that key.
-  - Submit only while `Transcribing` lessons for that provider < `MaxConcurrentJobs` (AssemblyAI 5, Gladia 3). Waiting lessons stay `Discovered`.
+### AD-6 — One transcription provider
 
-### AD-9 — Audio is a URL only
+- Only `AssemblyAiTranscriptionProvider` is registered; `TranscribeStep` takes it by constructor. `GladiaTranscriptionProvider` is an unregistered placeholder with a `Transcription:Gladia` config section, for demonstration.
+- At submit the lesson stores the provider key and job id. If a stored key doesn't match the registered provider, the step throws `Configuration`.
+- Submit only while open jobs < `MaxConcurrentJobs` (AssemblyAI 5).
 
-- **Binds:** CAP-1, CAP-5
-- **Prevents:** stored or downloaded audio; timestamps that don't match playback.
-- **Rule:**
-  - Only audio URLs are persisted. No code requests an audio URL during import, and no code stores audio bytes, server-side or in the browser.
-  - Transcription providers fetch the URL themselves; upload endpoints are never used.
-  - The URL submitted for transcription is the URL every segment plays.
-  - The browser preloads audio when a lesson opens and shows clear load errors ([web-contract.md](web-contract.md)).
+### AD-7 — Audio is a URL only
 
-### AD-10 — Canonical language, mapped at the edge
+- Only audio URLs are stored. No code requests an audio URL during import or stores audio bytes, server-side or in the browser. Providers fetch the URL themselves; no upload endpoints.
+- The URL sent to transcription is the URL every segment plays (BBC `_download.mp3`, never the RSS enclosure).
 
-- **Binds:** CAP-6
-- **Prevents:** provider-specific language codes in the domain or database.
-- **Rule:**
-  - `Lesson.Language` stores `en`.
-  - `ImportService` iterates `Import:Languages` ∩ each source's `SupportedLanguages`.
-  - Adapters map to their provider's code (Tatoeba `eng`).
+### AD-8 — The UI is a REST client only
 
-### AD-11 — The UI is a client of the REST API only
+- `wwwroot` calls only the endpoints in [web-contract.md](web-contract.md); only `Ready` lessons are exposed.
+- Lesson detail carries no text; text comes only from `/transcript`.
 
-- **Binds:** CAP-4, CAP-5, CAP-7
-- **Prevents:** the UI reading data directly; transcript text leaking before reveal.
-- **Rule:**
-  - `wwwroot` calls only the endpoints in [web-contract.md](web-contract.md), and only `Ready` lessons are exposed.
-  - Lesson detail carries no text; the text comes only from `/transcript`.
+### AD-9 — Tests never touch live providers
 
-### AD-12 — Tests never touch live providers
+- Adapters are tested against recorded responses in `Fixtures/{provider}/`, with no keys. A shared transcription contract test (non-empty trimmed text, integer ms, ordered, non-overlapping) runs for AssemblyAI.
+- `Pipeline<T>`, each step, `DiscoveryService` and `ImportRunner` are unit-tested with stubs, including one "fits every source" test: a lesson with segments skips `transcribe` and ends `Ready`; one with no audio and no segments ends `Failed`.
+- API tests use `Import:Enabled=false` and a temporary SQLite file.
 
-- **Binds:** CAP-1, CAP-2
-- **Prevents:** tests depending on keys or network; the two transcription adapters diverging.
-- **Rule:**
-  - Adapters are tested against recorded responses in `Fixtures/{provider}/`, with no keys or usernames.
-  - Both transcription adapters pass one shared contract test: non-empty, trimmed text; integer ms; ordered and non-overlapping.
-  - API tests use `Import:Enabled=false` and a temporary SQLite file. `ImportService` is tested with stubbed ports.
-
-## Consistency Conventions
+## Conventions
 
 | Concern | Convention |
 | --- | --- |
-| Naming | `{Provider}{Role}` adapters, `I`-prefixed ports, `internal` `…Dto` classes |
-| Data | Integer ms for audio positions; UTC `DateTime`; `Guid` ids; `TimeProvider` for time; camelCase JSON, nulls omitted; internal enums persisted by name |
-| Errors | `ProblemDetails` for every HTTP error (exception detail in Development only); no exception escapes one lesson's import |
-| Logging | Structured; import logs carry `LessonId`, `Source`, `Stage`, detail; never headers or keys |
-| Config | Typed options under `Sources:*`, `Transcription:*`, `Import:*`; API keys (`Transcription:{Provider}:ApiKey`) read from appsettings, set in the gitignored `appsettings.Local.json` and never committed |
+| Naming | `{Provider}{Role}` adapters, `{Work}Step` steps, `I`-prefixed interfaces, `internal` `{Provider}…Dto` |
+| Data | Integer ms; UTC via `TimeProvider`; `Guid` ids; camelCase JSON, nulls omitted; enums persisted by name |
+| Errors | `ProblemDetails` for every HTTP error (detail in Development only) |
+| Logging | Structured; import logs carry `LessonId`, `Source`, `Stage` (step name or `discovery`); never headers or keys |
+| Config | Typed options under `Sources:*`, `Transcription:*`, `Import:*`; keys in gitignored `appsettings.Local.json` |
 | Code | `async` I/O with `CancellationToken`; typed `HttpClient`s with the standard resilience handler; Kestrel on `localhost` |
+| Startup | `MigrateAsync()` before `app.Run()`, never `EnsureCreated`; SQLite in WAL mode |
 
 ## Stack
 
@@ -188,49 +151,12 @@ graph LR
 
 ## Structural Seed
 
-```mermaid
-stateDiagram-v2
-  [*] --> Discovered: BBC
-  [*] --> Ready: Tatoeba
-  Discovered --> Transcribing: StartTranscription
-  Transcribing --> Ready: Complete
-  Discovered --> Failed: Fail
-  Transcribing --> Failed: Fail
-  Ready --> [*]
-  Failed --> [*]
-```
-
-```mermaid
-erDiagram
-  LESSON ||--o{ SEGMENT : contains
-  LESSON {
-    guid Id
-    string Source
-    string ExternalId
-    string Title
-    string Language
-    string SourceUrl
-    string SourceAudioUrl
-    string Status
-    string TranscriptionProvider
-    string TranscriptionJobId
-    datetime TranscriptionStartedAt
-    datetime CreatedAt
-  }
-  SEGMENT {
-    int Index
-    string ExternalKey
-    string Text
-    string AudioUrl
-    int StartMs
-    int EndMs
-  }
-```
+`Lesson { Id, Source, ExternalId, Title, Language, SourceUrl, SourceAudioUrl?, Status, TranscriptionProvider?, TranscriptionJobId?, TranscriptionStartedAt?, CreatedAt }` owns `Segment`s (AD-2).
 
 ```text
-src/Dictation.Domain/          # Lessons/: Lesson, Segment, LessonStatus
-src/Dictation.Application/     # Import/: ImportService, ports, ProviderException, options; Lessons/: LessonQueryService
-src/Dictation.Infrastructure/  # Sources/*, Transcription/*, Persistence (EF + migrations)
+src/Dictation.Domain/          # Lessons/
+src/Dictation.Application/     # Pipelines/; Import/ (ImportRunner, DiscoveryService, Steps/, interfaces, options); Lessons/
+src/Dictation.Infrastructure/  # Sources/*, Transcription/* (AssemblyAi, Gladia placeholder), Persistence/
 src/Dictation.Api/             # Program.cs, Endpoints/, ImportBackgroundService, wwwroot/
 tests/Dictation.Tests/         # Domain/, Application/, Persistence/, Adapters/ + Fixtures/, Api/
 ```
@@ -239,8 +165,6 @@ Runs locally only (`dotnet run --project src/Dictation.Api`); the SQLite file is
 
 ## Deferred
 
-- **Retrying failed lessons:** one new `Lesson` method plus an endpoint or command.
-- **Separate Worker host:** only the host changes (AD-7).
-- **Other deferrals:** webhooks; Docker, cloud, CI; auth; metrics and tracing; non-English sources.
-- **To confirm in the first test story:** xunit.v3 4.x works with `Mvc.Testing` 10. If not, pin 3.2.2.
-- **Provider API formats:** re-check before the adapter stories if past 2026-11-22.
+- Retrying failed lessons; a separate Worker host (only the host changes); implementing Gladia.
+- Webhooks; Docker, cloud, CI; auth; metrics and tracing; non-English sources.
+- Re-check provider API formats before the adapter stories if past 2026-11-22.

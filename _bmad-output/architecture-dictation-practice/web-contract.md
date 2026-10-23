@@ -1,6 +1,6 @@
 # Web contract — Dictation Practice
 
-Companion to `architecture-dictation-practice.md`. It implements AD-3, AD-9 and AD-11: the REST endpoints the UI calls, and the player's behaviour.
+Companion to `architecture-dictation-practice.md`. It implements AD-2, AD-7 and AD-8: the REST endpoints the UI calls, and the player's behaviour.
 
 ## REST endpoints
 

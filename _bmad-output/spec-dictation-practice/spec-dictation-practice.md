@@ -1,6 +1,9 @@
 ---
 id: SPEC-dictation-practice
 companions:
+  - ../architecture-dictation-practice/architecture-dictation-practice.md
+  - ../architecture-dictation-practice/adapter-rules.md
+  - ../architecture-dictation-practice/web-contract.md
   - ../research-audio-sources-and-transcription-integrat/research-audio-sources-and-transcription-integrat.md
   - ../research-audio-sources-and-transcription-integrat/digests/sources-bbc.md
   - ../research-audio-sources-and-transcription-integrat/digests/sources-tatoeba.md
@@ -25,8 +28,8 @@ sources: []
     - Each new Tatoeba item holds N sentences with their own clip. Clips with an empty or disallowed licence are never stored.
     - A second run adds no duplicates.
 - **CAP-2**
-  - **intent:** The transcription provider can be swapped by configuration, with AssemblyAI as the default and Gladia as the alternative, without changing the sentence output.
-  - **success:** Both providers' recorded responses map to the same normalized sentence list `{index, text, startMs, endMs}`. Switching the config value changes the provider used by the next run.
+  - **intent:** Transcription goes through one `ITranscriptionProvider` interface. AssemblyAI is implemented and registered. A Gladia adapter exists as an unregistered placeholder with its config section, showing where an alternative plugs in.
+  - **success:** AssemblyAI's recorded responses map to the normalized sentence list `{index, text, startMs, endMs}`. Swapping the provider needs only a DI registration change and config.
 - **CAP-3**
   - **intent:** Ingestion tolerates failure: each item tracks its own status, transient errors are retried, and the job resumes after a restart.
   - **success:**
