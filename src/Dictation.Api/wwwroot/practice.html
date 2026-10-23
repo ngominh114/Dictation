@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Practice · Dictation Practice</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="inner">
+      <span class="brand-mark" aria-hidden="true">✎</span>
+      <a class="brand" href="index.html">Dictation Practice</a>
+    </div>
+  </header>
+  <main>
+    <a class="back" href="index.html">← All lessons</a>
+    <h1 id="title">Loading…</h1>
+    <p id="source" class="muted"></p>
+
+    <section class="card player" aria-label="Player">
+      <p id="position" class="position"></p>
+      <div class="progress" aria-hidden="true"><div id="progress" class="progress-bar"></div></div>
+      <div class="controls">
+        <button id="previous" type="button" disabled>⏮ Previous</button>
+        <button id="play" class="primary" type="button" disabled>▶ Play</button>
+        <button id="replay" type="button" disabled>↻ Replay</button>
+        <button id="next" type="button" disabled>Next ⏭</button>
+      </div>
+      <p id="status" class="status muted">Loading the audio…</p>
+      <div id="error" class="error" role="alert" hidden>
+        <p id="error-message"></p>
+        <button id="retry" type="button">Retry</button>
+      </div>
+    </section>
+
+    <section class="card transcript-card" aria-label="Transcript">
+      <button id="toggle-transcript" class="link" type="button" disabled>Show transcript</button>
+      <ol id="transcript" class="transcript" hidden></ol>
+    </section>
+  </main>
+  <script src="js/audioLoader.js"></script>
+  <script src="js/practice.js"></script>
+</body>
+</html>

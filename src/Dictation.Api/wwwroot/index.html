@@ -4,11 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dictation Practice</title>
+  <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
+  <header class="app-header">
+    <div class="inner">
+      <span class="brand-mark" aria-hidden="true">✎</span>
+      <a class="brand" href="index.html">Dictation Practice</a>
+    </div>
+  </header>
   <main>
-    <h1>Dictation Practice</h1>
-    <p>Lessons will appear here soon.</p>
+    <h1>Lessons</h1>
+    <p id="status" class="muted">Loading lessons…</p>
+    <ul id="lessons" class="lessons"></ul>
+    <nav class="pager" aria-label="Pages">
+      <button id="previous" type="button" disabled>← Previous</button>
+      <span id="page" class="muted"></span>
+      <button id="next" type="button" disabled>Next →</button>
+    </nav>
   </main>
+  <script src="js/list.js"></script>
 </body>
 </html>
