@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Practice · Dictation Practice</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <main>
+    <p><a href="index.html">← All lessons</a></p>
+    <h1 id="title">Loading…</h1>
+    <p id="source" class="muted"></p>
+
+    <p id="status" class="muted">Loading the audio…</p>
+    <div id="error" class="error" role="alert" hidden>
+      <p id="error-message"></p>
+      <button id="retry" type="button">Retry</button>
+    </div>
+
+    <p id="position" class="position"></p>
+    <div class="controls">
+      <button id="previous" type="button" disabled>Previous</button>
+      <button id="play" type="button" disabled>Play</button>
+      <button id="replay" type="button" disabled>Replay</button>
+      <button id="next" type="button" disabled>Next</button>
+    </div>
+
+    <button id="toggle-transcript" type="button" disabled>Show transcript</button>
+    <ol id="transcript" class="transcript" hidden></ol>
+  </main>
+  <script src="js/audioLoader.js"></script>
+  <script src="js/practice.js"></script>
+</body>
+</html>
