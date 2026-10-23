@@ -31,9 +31,9 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 | `Dictation.Application` | `Pipeline<T>` and `IPipelineStep<T>`; import (`ImportLessonsUseCase`, `LessonPipeline`, `TranscribeStep`, `FinishStep`); `LessonQueryService`; interfaces for adapters and the repository; `ImportException`; options |
 | `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonRepository`) |
 | `Dictation.Api` | `Program.cs`, Minimal API endpoints, `ImportWorker`, `wwwroot` UI |
-| `Dictation.Tests` | Unit tests: domain, pipeline and use case with fakes, adapters on recorded responses |
+| `Dictation.Tests` | Unit tests of our own behaviour: domain, pipeline and use case with fakes |
 
-**Built:** the Tatoeba import end to end. **Planned:** BBC and AssemblyAI (the real `TranscribeStep`), the Gladia placeholder, `LessonQueryService`, the REST endpoints and the UI.
+**Built:** the Tatoeba and BBC imports end to end, with AssemblyAI transcription. **Planned:** the Gladia placeholder, `LessonQueryService`, the REST endpoints and the UI.
 
 **Import flow:**
 
@@ -53,7 +53,7 @@ graph LR
 
 - `Domain` references nothing. `Application` references only `Domain` and `Microsoft.Extensions.*.Abstractions`. `Infrastructure` references only `Application`. Adapters never reference each other or the repository. Project references enforce this.
 - Sources and providers have constant lowercase keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`), not enums.
-- Add a source = adapter + DI registration + config + fixtures. Add a step = step + one line in `LessonPipeline.ConfigureSteps`.
+- Add a source = adapter + DI registration + config. Add a step = step + one line in `LessonPipeline.ConfigureSteps`.
 
 ### AD-2 — Sources fetch items; adapters map them to `Lesson`s
 
@@ -104,8 +104,9 @@ graph LR
 ### AD-6 — One transcription provider
 
 - Only `AssemblyAiTranscriptionProvider` is registered; `TranscribeStep` takes it by constructor. `GladiaTranscriptionProvider` is an unregistered placeholder with a `Transcription:Gladia` config section, for demonstration.
-- At submit the lesson stores the provider key and job id. If a stored key doesn't match the registered provider, the step throws and the lesson fails.
-- Submit only while open jobs < `MaxConcurrentJobs` (AssemblyAI 5).
+- `TranscribeStep` submits the audio, records the provider key and job id with `StartTranscription`, polls every `Transcription:PollIntervalSeconds` (5) until done, then adds one segment per sentence. A job still polling when the app stops is lost; the next start submits the episode again.
+- Episodes are imported one at a time, so at most one job is open (AssemblyAI allows 5).
+- Without `Transcription:AssemblyAi:ApiKey`, the BBC source is not registered, so no episode fails for a missing key.
 
 ### AD-7 — Audio is a URL only
 
@@ -117,11 +118,12 @@ graph LR
 - `wwwroot` calls only the endpoints in [web-contract.md](web-contract.md); only `Ready` lessons are exposed.
 - Lesson detail carries no text; text comes only from `/transcript`.
 
-### AD-9 — Unit tests only, never touching live providers
+### AD-9 — Unit tests of our behaviour only
 
 - For now the suite is unit tests only: no API host, no database, no network. Integration tests come later.
 
-- Adapters are tested with a fake HTTP handler serving recorded responses from `Fixtures/{provider}/`, with no keys. A shared transcription contract test (non-empty trimmed text, integer ms, ordered, non-overlapping) runs for AssemblyAI.
+- Adapters (sources, transcription) are not unit tested; they are checked by running the app against the real services.
+- Tests cover the happy path and that any error, whatever its kind, fails the lesson and later runs skip it.
 - The domain, `Pipeline<T>`, each step and `ImportLessonsUseCase` are tested with in-memory fakes, including one "fits every source" test: a lesson with segments skips `TranscribeStep` and ends `Ready`; one with no audio and no segments ends `Failed`.
 
 ## Conventions
@@ -156,7 +158,7 @@ src/Dictation.Domain/          # Lessons/
 src/Dictation.Application/     # Pipelines/; Import/ (ImportLessonsUseCase, LessonPipeline, Steps/, interfaces, options); Lessons/
 src/Dictation.Infrastructure/  # Sources/*, Transcription/* (AssemblyAi, Gladia placeholder), Persistence/
 src/Dictation.Api/             # Program.cs, Endpoints/, ImportWorker, wwwroot/
-tests/Dictation.Tests/         # Domain/, Application/, Persistence/, Adapters/ + Fixtures/, Api/
+tests/Dictation.Tests/         # Domain/, Application/, Support/ (fakes)
 ```
 
 Runs locally only (`dotnet run --project src/Dictation.Api`); the SQLite file is gitignored.

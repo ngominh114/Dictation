@@ -35,7 +35,7 @@ sources: []
   - **success:**
     - A failing item is marked failed while other items complete. The failure detail is logged, not stored.
     - A failed item is not run again on later app starts; a retry feature is deferred.
-    - Stopping and restarting the app continues pending transcriptions without resubmitting them.
+    - Stopping the app during a transcription loses only that job; the next start submits the episode again.
 - **CAP-4**
   - **intent:** The learner can browse practice items page by page.
   - **success:** The backend returns a requested page and page size with the total count, and the UI moves between pages.

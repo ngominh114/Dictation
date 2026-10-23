@@ -20,11 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Dictation.Infrastructure\Dictation.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Dictation.Application\Dictation.Application.csproj" />
     <ProjectReference Include="..\..\src\Dictation.Domain\Dictation.Domain.csproj" />
   </ItemGroup>

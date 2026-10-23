@@ -65,20 +65,14 @@ public sealed class StubPipeline(params IPipelineStep<Lesson>[] stepList) : Pipe
 
 public static class TestImport
 {
-    /// <summary><see cref="ImportLessonsUseCase"/> over <paramref name="repository"/> with the given steps, in order.</summary>
-    public static ImportLessonsUseCase UseCase(InMemoryLessonRepository repository, params IPipelineStep<Lesson>[] steps)
-    {
-        var options = Options.Create(new ImportOptions
-        {
-            Enabled = true,
-            Languages = ["en"],
-            MaxPerSource = 5,
-        });
+    /// <summary>The real lesson pipeline over <paramref name="provider"/> (a fake by default), polling without delay.</summary>
+    public static LessonPipeline Pipeline(ITranscriptionProvider? provider = null) =>
+        new(provider ?? new FakeTranscriptionProvider(), Options.Create(new TranscriptionOptions { PollIntervalSeconds = 0 }));
 
-        return new ImportLessonsUseCase(
+    public static ImportLessonsUseCase UseCase(InMemoryLessonRepository repository, Pipeline<Lesson> pipeline) =>
+        new(
             repository,
-            new StubPipeline(steps),
-            options,
+            pipeline,
+            Options.Create(new ImportOptions { Enabled = true, Languages = ["en"], MaxPerSource = 5 }),
             NullLogger<ImportLessonsUseCase>.Instance);
-    }
 }

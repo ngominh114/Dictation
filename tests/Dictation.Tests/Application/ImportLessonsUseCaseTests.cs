@@ -1,10 +1,8 @@
-using Dictation.Application.Import.Steps;
 using Dictation.Domain.Lessons;
 using Dictation.Tests.Support;
 
 namespace Dictation.Tests.Application;
 
-/// <summary>Matrix rows "Fits every source" and "Step failure" (AD-3, AD-5, AD-9).</summary>
 public sealed class ImportLessonsUseCaseTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
@@ -17,7 +15,7 @@ public sealed class ImportLessonsUseCaseTests
         withSegments.AddSentence("1:10");
         var empty = TestLessons.Create();
 
-        await TestImport.UseCase(repository, new TranscribeStep(), new FinishStep())
+        await TestImport.UseCase(repository, TestImport.Pipeline())
             .ExecuteAsync(new StubSource("tatoeba", withSegments, empty), Ct);
 
         Assert.Equal(LessonStatus.Ready, withSegments.Status);
@@ -30,14 +28,14 @@ public sealed class ImportLessonsUseCaseTests
     {
         var repository = new InMemoryLessonRepository();
         var audio = TestLessons.CreateAudio();
-        var transcribe = new StubStep(_ => true, _ => throw new InvalidOperationException("boom"));
-        var useCase = TestImport.UseCase(repository, transcribe, new StubStep(_ => false));
+        var failing = new StubStep(_ => true, _ => throw new InvalidOperationException("boom"));
+        var useCase = TestImport.UseCase(repository, new StubPipeline(failing));
 
         await useCase.ExecuteAsync(new StubSource("bbc", audio), Ct);
         await useCase.ExecuteAsync(new StubSource("bbc", audio), Ct);
 
         Assert.Equal(LessonStatus.Failed, audio.Status);
         Assert.Single(repository.Lessons);
-        Assert.Equal(1, transcribe.Runs);
+        Assert.Equal(1, failing.Runs);
     }
 }

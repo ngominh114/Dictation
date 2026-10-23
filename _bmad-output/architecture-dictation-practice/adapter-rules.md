@@ -33,15 +33,15 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
 - **Submit:** `POST /v2/transcript` with `{ audio_url, language_code }`.
 - **Poll:** `GET /v2/transcript/{id}`.
 - **Sentences:** `GET /v2/transcript/{id}/sentences`. Times are already integer ms.
-- **Concurrency:** `MaxConcurrentJobs` default 5.
-- **Language:** `en` vs `en_us` is settled by the first real call, inside this adapter only.
+- **Auth:** header `authorization: {Transcription:AssemblyAi:ApiKey}`, no `Bearer`.
+- **Language:** sends `language_code: "en"`; if the first real call needs `en_us`, change it inside this adapter only.
 
 ## Gladia — `GladiaTranscriptionProvider` (key `gladia`)
 
 Placeholder, not registered in DI (AD-6). Every method throws `ImportException("Gladia is a placeholder and not implemented")`. The rules below are reference for a future implementation.
 
 - **Submit:** `POST /v2/pre-recorded` with `{ audio_url, language_config }`.
-- **Poll:** `GET /v2/pre-recorded/{jobId}`, verified by fixture.
+- **Poll:** `GET /v2/pre-recorded/{jobId}`.
 - **Sentences:** flatten `utterances[].words[]` and end a sentence after a word ending in `.`, `?` or `!`. `StartMs = floor(first.start × 1000)`, `EndMs = ceil(last.end × 1000)`.
 - **Concurrency:** `MaxConcurrentJobs` default 3.
 
@@ -50,4 +50,3 @@ Placeholder, not registered in DI (AD-6). Every method throws `ImportException("
 - A provider `error` status is thrown as `ImportException`; it is never returned as a status.
 - Drop sentences whose trimmed text is empty. If none remain, throw `ImportException`.
 - Clamp overlaps so `EndMs[i] ≤ StartMs[i+1]`.
-- Every registered transcription adapter passes the shared contract test (AD-9).

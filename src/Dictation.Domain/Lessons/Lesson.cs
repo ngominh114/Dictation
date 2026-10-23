@@ -69,6 +69,18 @@ public sealed class Lesson
         Status = LessonStatus.Ready;
     }
 
+    /// <summary>Records the transcription job and marks the lesson <see cref="LessonStatus.Transcribing"/>.</summary>
+    public void StartTranscription(string provider, string jobId, DateTime startedAt)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(provider);
+        ArgumentException.ThrowIfNullOrWhiteSpace(jobId);
+
+        TranscriptionProvider = provider;
+        TranscriptionJobId = jobId;
+        TranscriptionStartedAt = ToUtc(startedAt);
+        Status = LessonStatus.Transcribing;
+    }
+
     /// <summary>Marks the lesson <see cref="LessonStatus.Failed"/>.</summary>
     public void Fail() => Status = LessonStatus.Failed;
 
