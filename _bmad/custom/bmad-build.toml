@@ -4,6 +4,7 @@
 [workflow]
 
 persistent_facts = [
+  "Never commit, branch, merge or push unless the user explicitly asks in this conversation. When a step says to create a commit, skip it, leave the changes in the working tree, and tell the user they are uncommitted.",
   "No epics, stories or sprint tracking in this project. Always take the freeform path: never compile epic context, never resolve a story key, never read or write sprint-status.yaml. The source of truth is _bmad-output/spec-dictation-practice/spec-dictation-practice.md plus its companions (architecture-dictation-practice.md, adapter-rules.md, web-contract.md); list them in every new spec's `context:` frontmatter. The user names each slice of work to build; their corrections in conversation override these documents.",
   "Working style is TDD with two isolated agents: a test agent writes the test plan and the failing tests first; a separate implementation agent, with no knowledge of the tests, then implements the feature from the spec. Tests written in the test phase are never edited by the implementation agent.",
 ]
@@ -15,11 +16,11 @@ Run the implementation as TDD in three phases. Do not merge phases or reuse an a
 
 > Read {spec_file} fully, and every file listed in its frontmatter `context:`. You are the test author; you do not implement the feature.
 >
-> 1. Write a test plan to `<spec file name without .md>-test-plan.md`, next to {spec_file}. Map every acceptance criterion and I/O matrix row to one or more named test cases (unit, adapter-with-recorded-fixture, or API integration, per the architecture's testing rule). Mark anything that can only be verified manually, such as browser audio behaviour, as `manual` with steps.
+> 1. Plan the tests in your head; do not write a test plan file. Cover only the necessary cases: one test per acceptance criterion and I/O matrix row that matters for the business behaviour Write unit tests only: no API host, no database, no network (adapters run against a fake HTTP handler serving recorded responses). No integration tests for now. No exhaustive variations, no tests of trivial plumbing. Anything only verifiable end to end or manually, such as browser audio behaviour, goes in your report as `manual` with steps.
 > 2. Implement those tests under `tests/`. When a type or member the tests need does not exist yet, create only its public signature in `src/` (interface, record, or a method body that throws `NotImplementedException`), named as the spec and architecture name it, so the solution compiles. Write no real logic in `src/`.
 > 3. Run `dotnet build` and `dotnet test`. Every new test must compile and fail for the expected reason (not-implemented or a wrong result), never because of a build error.
 >
-> Report: the test plan path, the list of test files, and the red test run summary.
+> Report: the mapping of each acceptance criterion and matrix row to its test name, any `manual` cases, the list of test files, and the red test run summary.
 
 After Phase 1, commit nothing, but record the test baseline: write a hash of every file under `tests/` (for example the output of `git hash-object` per file) to a uniquely named file in the system temp directory, as `{test_snapshot}`.
 
@@ -27,7 +28,7 @@ After Phase 1, commit nothing, but record the test baseline: write a hash of eve
 
 > Read {spec_file} fully and implement it. The spec is the sole source of truth. Load every file listed in its frontmatter `context:` before you start.
 >
-> Rules: do not open, read, or modify anything under `tests/` and do not read any `*-test-plan.md` file. Signatures already present in `src/` (methods that throw `NotImplementedException`) are yours to implement. Keep their names and signatures unless the spec contradicts them. Verify only by running `dotnet build` and `dotnet test` and reading their console output. Iterate until the build is clean and all tests pass, or until you are sure a remaining failure is caused by a test rather than by your code.
+> Rules: do not open, read, or modify anything under `tests/` Signatures already present in `src/` (methods that throw `NotImplementedException`) are yours to implement. Keep their names and signatures unless the spec contradicts them. Verify only by running `dotnet build` and `dotnet test` and reading their console output. Iterate until the build is clean and all tests pass, or until you are sure a remaining failure is caused by a test rather than by your code.
 >
 > When done, report what you changed, the final test run summary, any test you believe is wrong (by name, with the spec line it contradicts), and anything left incomplete or risky.
 
@@ -35,5 +36,5 @@ After Phase 1, commit nothing, but record the test baseline: write a hash of eve
 - Recompute the hashes for `tests/` and compare them with `{test_snapshot}`. Any change to a test file made in Phase 2 is a violation: revert it, and send the failure back to the Phase 2 agent.
 - Run `dotnet test` yourself. If tests still fail, re-engage the Phase 2 agent with the failing test names and output only, up to 3 rounds.
 - If the Phase 2 agent reports a test as wrong, or failures persist after 3 rounds, judge against the spec. When the test is wrong, re-engage a Phase 1-style test agent to fix only that test, then return to Phase 2. When the spec is ambiguous, HALT and ask the human.
-- Proceed to acceptance verification only when the build is clean and every test passes. Report manual test cases from the test plan to the human at presentation time.
+- Proceed to acceptance verification only when the build is clean and every test passes. Report the test agent's manual cases to the human at presentation time.
 """

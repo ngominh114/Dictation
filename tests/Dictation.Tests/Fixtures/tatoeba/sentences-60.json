@@ -1,0 +1,1208 @@
+{
+  "data": [
+    {
+      "id": 14000001,
+      "text": "We left before noon.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200001,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200001/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000002,
+      "text": "Close the window, please.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200002,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200002/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000003,
+      "text": "She reads every night.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200003,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200003/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000004,
+      "text": "It rained all week.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200004,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200004/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000005,
+      "text": "The bus was late again.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200005,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200005/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000006,
+      "text": "I like green tea.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200006,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200006/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000007,
+      "text": "He fixed the old bike.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200007,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200007/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000008,
+      "text": "Turn left at the bank.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200008,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200008/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000009,
+      "text": "They planted two trees.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200009,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200009/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000010,
+      "text": "The kettle is on.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200010,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200010/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000011,
+      "text": "We left before noon.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200011,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200011/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000012,
+      "text": "Close the window, please.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200012,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200012/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000013,
+      "text": "She reads every night.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200013,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200013/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000014,
+      "text": "It rained all week.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200014,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200014/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000015,
+      "text": "The bus was late again.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200015,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200015/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000016,
+      "text": "I like green tea.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200016,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200016/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000017,
+      "text": "He fixed the old bike.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200017,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200017/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000018,
+      "text": "Turn left at the bank.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200018,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200018/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000019,
+      "text": "They planted two trees.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200019,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200019/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000020,
+      "text": "The kettle is on.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200020,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200020/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000021,
+      "text": "We left before noon.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200021,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200021/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000022,
+      "text": "Close the window, please.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200022,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200022/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000023,
+      "text": "She reads every night.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200023,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200023/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000024,
+      "text": "It rained all week.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200024,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200024/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000025,
+      "text": "The bus was late again.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200025,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200025/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000026,
+      "text": "I like green tea.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200026,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200026/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000027,
+      "text": "He fixed the old bike.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200027,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200027/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000028,
+      "text": "Turn left at the bank.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200028,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200028/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000029,
+      "text": "They planted two trees.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200029,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200029/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000030,
+      "text": "The kettle is on.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200030,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200030/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000031,
+      "text": "We left before noon.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200031,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200031/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000032,
+      "text": "Close the window, please.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200032,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200032/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000033,
+      "text": "She reads every night.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200033,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200033/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000034,
+      "text": "It rained all week.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200034,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200034/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000035,
+      "text": "The bus was late again.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200035,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200035/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000036,
+      "text": "I like green tea.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200036,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200036/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000037,
+      "text": "He fixed the old bike.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200037,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200037/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000038,
+      "text": "Turn left at the bank.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200038,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200038/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000039,
+      "text": "They planted two trees.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200039,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200039/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000040,
+      "text": "The kettle is on.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200040,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200040/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000041,
+      "text": "We left before noon.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200041,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200041/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000042,
+      "text": "Close the window, please.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200042,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200042/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000043,
+      "text": "She reads every night.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200043,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200043/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000044,
+      "text": "It rained all week.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200044,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200044/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000045,
+      "text": "The bus was late again.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200045,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200045/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000046,
+      "text": "I like green tea.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200046,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200046/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000047,
+      "text": "He fixed the old bike.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200047,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200047/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000048,
+      "text": "Turn left at the bank.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200048,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200048/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000049,
+      "text": "They planted two trees.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200049,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200049/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000050,
+      "text": "The kettle is on.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200050,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200050/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000051,
+      "text": "We left before noon.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200051,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200051/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000052,
+      "text": "Close the window, please.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200052,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200052/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000053,
+      "text": "She reads every night.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200053,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200053/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000054,
+      "text": "It rained all week.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200054,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200054/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000055,
+      "text": "The bus was late again.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200055,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200055/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000056,
+      "text": "I like green tea.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200056,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200056/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000057,
+      "text": "He fixed the old bike.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200057,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200057/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000058,
+      "text": "Turn left at the bank.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200058,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200058/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000059,
+      "text": "They planted two trees.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200059,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200059/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    },
+    {
+      "id": 14000060,
+      "text": "The kettle is on.",
+      "lang": "eng",
+      "script": null,
+      "license": "CC BY 2.0 FR",
+      "owner": "<user>",
+      "is_unapproved": false,
+      "audios": [
+        {
+          "id": 1200060,
+          "created": "2026-09-26T05:43:42+00:00",
+          "author": "<user>",
+          "license": "CC BY-NC-ND 3.0",
+          "attribution_url": "https://tatoeba.org/user/profile/<user>",
+          "download_url": "https://api.tatoeba.org/v1/audio/1200060/file",
+          "modified": "2026-09-26T05:43:42+00:00"
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "total": 60,
+    "has_next": false
+  }
+}

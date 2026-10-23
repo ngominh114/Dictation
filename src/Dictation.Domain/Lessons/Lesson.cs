@@ -4,17 +4,39 @@ public sealed class Lesson
 {
     private readonly List<Segment> _segments = [];
 
-    /// <summary>
-    /// Construction hook used by story 1.1 tests. Public lifecycle factories
-    /// (<c>CreateReady</c>, <c>CreateDiscovered</c>, ...) arrive in stories 1.2 / Epic 2.
-    /// </summary>
-    internal Lesson(
+    private Lesson(
         string source,
         string externalId,
         string title,
         string language,
         string sourceUrl,
-        LessonStatus status,
+        string? sourceAudioUrl,
+        DateTime createdAt)
+    {
+        Id = Guid.NewGuid();
+        Source = source;
+        ExternalId = externalId;
+        Title = title;
+        Language = language;
+        SourceUrl = sourceUrl;
+        SourceAudioUrl = sourceAudioUrl;
+        Status = LessonStatus.Discovered;
+        CreatedAt = ToUtc(createdAt);
+    }
+
+    // Used by EF Core materialization.
+    private Lesson()
+    {
+    }
+
+    /// <summary>Creates a newly discovered lesson (status <see cref="LessonStatus.Discovered"/>).</summary>
+    public static Lesson CreateDiscovered(
+        string source,
+        string externalId,
+        string title,
+        string language,
+        string sourceUrl,
+        string? sourceAudioUrl,
         DateTime createdAt)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(source);
@@ -23,20 +45,32 @@ public sealed class Lesson
         ArgumentNullException.ThrowIfNull(language);
         ArgumentNullException.ThrowIfNull(sourceUrl);
 
-        Id = Guid.NewGuid();
-        Source = source;
-        ExternalId = externalId;
-        Title = title;
-        Language = language;
-        SourceUrl = sourceUrl;
-        Status = status;
-        CreatedAt = ToUtc(createdAt);
+        return new Lesson(
+            source,
+            externalId,
+            title,
+            language,
+            sourceUrl,
+            string.IsNullOrWhiteSpace(sourceAudioUrl) ? null : sourceAudioUrl,
+            createdAt);
     }
 
-    // Used by EF Core materialization.
-    private Lesson()
+    /// <summary>True when the lesson is <see cref="LessonStatus.Ready"/> or <see cref="LessonStatus.Failed"/>.</summary>
+    public bool IsFinished => Status is LessonStatus.Ready or LessonStatus.Failed;
+
+    /// <summary>Marks the lesson <see cref="LessonStatus.Ready"/>. Throws <see cref="InvalidOperationException"/> without segments.</summary>
+    public void Complete()
     {
+        if (_segments.Count == 0)
+        {
+            throw new InvalidOperationException("A lesson cannot be completed without segments.");
+        }
+
+        Status = LessonStatus.Ready;
     }
+
+    /// <summary>Marks the lesson <see cref="LessonStatus.Failed"/>.</summary>
+    public void Fail() => Status = LessonStatus.Failed;
 
     public Guid Id { get; private set; }
 
@@ -69,7 +103,7 @@ public sealed class Lesson
     /// Appends a segment, assigning the next 0-based <see cref="Segment.Index"/> and copying
     /// this lesson's <see cref="Source"/> onto the segment's Source column.
     /// </summary>
-    internal Segment AddSegment(
+    public Segment AddSegment(
         string? externalKey,
         string text,
         string audioUrl,

@@ -1,4 +1,7 @@
+using Dictation.Api;
+using Dictation.Application.Import;
 using Dictation.Infrastructure.Persistence;
+using Dictation.Infrastructure.Sources.Tatoeba;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,7 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddProblemDetails();
-builder.Services.AddPersistence();
+// The connection string is read when a context is created, so a test host's override is honoured.
+builder.Services.AddDbContext<DictationDbContext>((provider, options) =>
+    options.UseSqlite(provider.GetRequiredService<IConfiguration>().GetConnectionString("Dictation")));
+builder.Services.AddScoped<ILessonRepository>(provider => provider.GetRequiredService<DictationDbContext>());
+
+builder.Services.AddOptions<ImportOptions>().BindConfiguration(ImportOptions.SectionName);
+builder.Services.AddImport();
+builder.Services.AddTatoebaSource();
+builder.Services.AddHostedService<ImportWorker>();
 
 var app = builder.Build();
 
