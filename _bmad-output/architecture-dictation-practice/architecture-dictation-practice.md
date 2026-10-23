@@ -3,7 +3,7 @@ name: 'Dictation Practice'
 type: architecture-spine
 purpose: build-substrate
 altitude: feature
-paradigm: 'Clean Architecture, small; Adapter pattern for external APIs; generic step pipeline for import'
+paradigm: 'Clean Architecture, small; Adapter pattern for external APIs; generic step pipeline for import; Mediator (MediatR) for lesson queries'
 scope: 'Whole Dictation Practice app: content import, transcription, storage, REST API, web UI'
 status: final
 created: '2026-10-22'
@@ -23,17 +23,17 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 
 ## Design Paradigm
 
-**Clean Architecture, kept small.** Four layers (Domain, Application, Infrastructure, Api) with dependencies pointing inward. `Application` defines the interfaces it needs (`IContentSource`, `ITranscriptionProvider`, `ILessonRepository`). Each external API gets one **adapter** in `Infrastructure` (Adapter pattern) that implements the interface and translates that API's DTOs to domain types. Use cases are plain services; no MediatR or CQRS.
+**Clean Architecture, kept small.** Four layers (Domain, Application, Infrastructure, Api) with dependencies pointing inward. `Application` defines the interfaces it needs (`IContentSource`, `ITranscriptionProvider`, `ILessonRepository`). Each external API gets one **adapter** in `Infrastructure` (Adapter pattern) that implements the interface and translates that API's DTOs to domain types. The import use case is a plain service. Reads use the **Mediator** pattern: an endpoint sends a query through MediatR's `ISender`, which forwards it to its handler.
 
 | Project | Holds |
 | --- | --- |
 | `Dictation.Domain` | `Lesson`, `Segment`, `LessonStatus`; no package references |
-| `Dictation.Application` | `Pipeline<T>` and `IPipelineStep<T>`; import (`ImportLessonsUseCase`, `LessonPipeline`, `TranscribeStep`, `FinishStep`); `LessonQueryService`; interfaces for adapters and the repository; `ImportException`; options |
-| `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonRepository`) |
+| `Dictation.Application` | `Pipeline<T>` and `IPipelineStep<T>`; import (`ImportLessonsUseCase`, `LessonPipeline`, `TranscribeStep`, `FinishStep`); lesson queries and their result records (`Lessons/`); interfaces for adapters and the repository; `ImportException`; options |
+| `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonRepository`); `LessonQueryHandlers` |
 | `Dictation.Api` | `Program.cs`, Minimal API endpoints, `ImportWorker`, `wwwroot` UI |
 | `Dictation.Tests` | Unit tests of our own behaviour: domain, pipeline and use case with fakes |
 
-**Built:** the Tatoeba and BBC imports end to end, with AssemblyAI transcription. **Planned:** the Gladia placeholder, `LessonQueryService`, the REST endpoints and the UI.
+**Built:** the Tatoeba and BBC imports end to end, with AssemblyAI transcription, and the REST endpoints. **Planned:** the Gladia placeholder and the UI.
 
 **Import flow:**
 
@@ -51,7 +51,7 @@ graph LR
 
 ### AD-1 — Dependencies point inward; things plug in
 
-- `Domain` references nothing. `Application` references only `Domain` and `Microsoft.Extensions.*.Abstractions`. `Infrastructure` references only `Application`. Adapters never reference each other or the repository. Project references enforce this.
+- `Domain` references nothing. `Application` references only `Domain`, `Microsoft.Extensions.*.Abstractions` and `MediatR.Contracts`. `Infrastructure` references only `Application`. Adapters never reference each other or the repository. Project references enforce this.
 - Sources and providers have constant lowercase keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`), not enums.
 - Add a source = adapter + DI registration + config. Add a step = step + one line in `LessonPipeline.ConfigureSteps`.
 
@@ -116,7 +116,8 @@ graph LR
 ### AD-8 — The UI is a REST client only
 
 - `wwwroot` calls only the endpoints in [web-contract.md](web-contract.md); only `Ready` lessons are exposed.
-- Lesson detail carries no text; text comes only from `/transcript`.
+- Lesson detail includes each segment's text; the UI keeps it hidden until the transcript button is pressed.
+- Each endpoint sends one query (`GetLessonsQuery`, `GetLessonQuery`) through `ISender`. The queries and result records live in `Application/Lessons`; `LessonQueryHandlers` in Infrastructure answers them from `DictationDbContext` with `AsNoTracking()`, filtered to `Ready`. Endpoints only validate input and map a null result to 404.
 
 ### AD-9 — Unit tests of our behaviour only
 
@@ -145,6 +146,7 @@ graph LR
 | .NET / ASP.NET Core (LTS) | 10.0.13 |
 | Microsoft.EntityFrameworkCore.Sqlite | 10.0.13 |
 | Microsoft.Extensions.Http.Resilience | 10.11.0 |
+| MediatR (last Apache-2.0 release; 13+ needs a licence key) | 12.5.0 |
 | xunit.v3 | 4.0.2 |
 | Microsoft.AspNetCore.Mvc.Testing | 10.0.13 |
 | UI | static HTML + vanilla JS |
@@ -155,7 +157,7 @@ graph LR
 
 ```text
 src/Dictation.Domain/          # Lessons/
-src/Dictation.Application/     # Pipelines/; Import/ (ImportLessonsUseCase, LessonPipeline, Steps/, interfaces, options); Lessons/
+src/Dictation.Application/     # Pipelines/; Import/ (ImportLessonsUseCase, LessonPipeline, Steps/, interfaces, options); Lessons/ (queries)
 src/Dictation.Infrastructure/  # Sources/*, Transcription/* (AssemblyAi, Gladia placeholder), Persistence/
 src/Dictation.Api/             # Program.cs, Endpoints/, ImportWorker, wwwroot/
 tests/Dictation.Tests/         # Domain/, Application/, Support/ (fakes)

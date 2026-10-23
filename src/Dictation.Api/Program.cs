@@ -1,4 +1,6 @@
+using System.Text.Json.Serialization;
 using Dictation.Api;
+using Dictation.Api.Endpoints;
 using Dictation.Application.Import;
 using Dictation.Infrastructure.Persistence;
 using Dictation.Infrastructure.Sources.Bbc;
@@ -12,10 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddProblemDetails();
+// camelCase (the web default), nulls omitted.
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
 // The connection string is read when a context is created, so a test host's override is honoured.
 builder.Services.AddDbContext<DictationDbContext>((provider, options) =>
     options.UseSqlite(provider.GetRequiredService<IConfiguration>().GetConnectionString("Dictation")));
 builder.Services.AddScoped<ILessonRepository>(provider => provider.GetRequiredService<DictationDbContext>());
+builder.Services.AddLessonQueries();
 
 builder.Services.AddOptions<ImportOptions>().BindConfiguration(ImportOptions.SectionName);
 builder.Services.AddImport();
@@ -45,6 +51,8 @@ app.UseStatusCodePages();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.MapLessonEndpoints();
 
 await using (var scope = app.Services.CreateAsyncScope())
 {

@@ -9,8 +9,7 @@ Only `Ready` lessons are exposed. A missing or non-`Ready` id returns 404 `Probl
 | Endpoint | Returns |
 | --- | --- |
 | `GET /api/lessons?page&pageSize` | `{ items: [{ id, title, source, language, segmentCount, createdAt }], page, pageSize, totalCount }` |
-| `GET /api/lessons/{id}` | `{ id, title, source, language, sourceUrl, segments: [{ index, audioUrl, startMs, endMs? }] }` (no text) |
-| `GET /api/lessons/{id}/transcript` | `[{ index, text }]` |
+| `GET /api/lessons/{id}` | `{ id, title, source, language, sourceUrl, segments: [{ index, text, audioUrl, startMs, endMs? }] }` |
 
 - **Paging:** `page` is 1-based (default 1). `pageSize` defaults to 20, range 1–100; out of range → 400 `ProblemDetails`.
 - **Order:** `createdAt DESC, id DESC`.
@@ -19,7 +18,7 @@ Only `Ready` lessons are exposed. A missing or non-`Ready` id returns 404 `Probl
 ## Pages
 
 - `index.html` shows the paginated lesson list.
-- `practice.html` is the player, plus the transcript button. The button calls the transcript endpoint only when pressed.
+- `practice.html` is the player, plus the transcript button. The text comes with the lesson detail and stays hidden until the button is pressed.
 
 ## Player — `wwwroot/js`
 
