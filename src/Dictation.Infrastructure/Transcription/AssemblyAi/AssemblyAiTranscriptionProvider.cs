@@ -60,10 +60,8 @@ public sealed class AssemblyAiTranscriptionProvider : ITranscriptionProvider
         return transcript.Id;
     }
 
-    public async Task<bool> IsCompletedAsync(string jobId, CancellationToken ct)
+    private async Task<bool> IsCompletedAsync(string jobId, CancellationToken ct)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(jobId);
-
         using var request = CreateRequest(HttpMethod.Get, $"/v2/transcript/{Uri.EscapeDataString(jobId)}");
         var transcript = await SendAsync<AssemblyAiTranscriptDto>(request, ct).ConfigureAwait(false);
         ThrowIfError(transcript);
@@ -79,6 +77,13 @@ public sealed class AssemblyAiTranscriptionProvider : ITranscriptionProvider
     public async Task<IReadOnlyList<TranscribedSentence>> GetSentencesAsync(string jobId, CancellationToken ct)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(jobId);
+
+        // No deadline: poll until the job completes, or throw on a provider error.
+        var pollInterval = TimeSpan.FromSeconds(Math.Max(1, _options.PollIntervalSeconds));
+        while (!await IsCompletedAsync(jobId, ct).ConfigureAwait(false))
+        {
+            await Task.Delay(pollInterval, ct).ConfigureAwait(false);
+        }
 
         using var request = CreateRequest(HttpMethod.Get, $"/v2/transcript/{Uri.EscapeDataString(jobId)}/sentences");
         var response = await SendAsync<AssemblyAiSentencesResponseDto>(request, ct).ConfigureAwait(false);

@@ -31,7 +31,7 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
 ## AssemblyAI — `AssemblyAiTranscriptionProvider` (key `assemblyai`)
 
 - **Submit:** `POST /v2/transcript` with `{ audio_url, language_code }`.
-- **Poll:** `GET /v2/transcript/{id}`.
+- **Poll:** `GET /v2/transcript/{id}` every `Transcription:AssemblyAi:PollIntervalSeconds` (default 5) until `completed`, inside `GetSentencesAsync`.
 - **Sentences:** `GET /v2/transcript/{id}/sentences`. Times are already integer ms.
 - **Auth:** header `authorization: {Transcription:AssemblyAi:ApiKey}`, no `Bearer`.
 - **Language:** sends `language_code: "en"`; if the first real call needs `en_us`, change it inside this adapter only.

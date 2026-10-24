@@ -104,7 +104,7 @@ graph LR
 ### AD-6 — One transcription provider
 
 - Only `AssemblyAiTranscriptionProvider` is registered; `TranscribeStep` takes it by constructor. `GladiaTranscriptionProvider` is an unregistered placeholder with a `Transcription:Gladia` config section, for demonstration.
-- `TranscribeStep` submits the audio, records the provider key and job id with `StartTranscription`, polls every `Transcription:PollIntervalSeconds` (5) until done, then adds one segment per sentence. A job still polling when the app stops is lost; the next start submits the episode again.
+- `TranscribeStep` submits the audio, records the provider key and job id with `StartTranscription`, asks the provider for the sentences (the AssemblyAI adapter polls every `Transcription:AssemblyAi:PollIntervalSeconds`, default 5, until the job is done), then adds one segment per sentence. A job still polling when the app stops is lost; the next start submits the episode again.
 - Episodes are imported one at a time, so at most one job is open (AssemblyAI allows 5).
 - Without `Transcription:AssemblyAi:ApiKey`, the BBC source is not registered, so no episode fails for a missing key.
 

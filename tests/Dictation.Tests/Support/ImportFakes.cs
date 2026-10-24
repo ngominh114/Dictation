@@ -65,9 +65,9 @@ public sealed class StubPipeline(params IPipelineStep<Lesson>[] stepList) : Pipe
 
 public static class TestImport
 {
-    /// <summary>The real lesson pipeline over <paramref name="provider"/> (a fake by default), polling without delay.</summary>
+    /// <summary>The real lesson pipeline over <paramref name="provider"/> (a fake by default).</summary>
     public static LessonPipeline Pipeline(ITranscriptionProvider? provider = null) =>
-        new(provider ?? new FakeTranscriptionProvider(), Options.Create(new TranscriptionOptions { PollIntervalSeconds = 0 }));
+        new(provider ?? new FakeTranscriptionProvider());
 
     public static ImportLessonsUseCase UseCase(InMemoryLessonRepository repository, Pipeline<Lesson> pipeline) =>
         new(

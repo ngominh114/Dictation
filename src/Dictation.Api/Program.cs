@@ -3,9 +3,6 @@ using Dictation.Api;
 using Dictation.Api.Endpoints;
 using Dictation.Application.Import;
 using Dictation.Infrastructure.Persistence;
-using Dictation.Infrastructure.Sources.Bbc;
-using Dictation.Infrastructure.Sources.Tatoeba;
-using Dictation.Infrastructure.Transcription.AssemblyAi;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,17 +22,7 @@ builder.Services.AddLessonQueries();
 
 builder.Services.AddOptions<ImportOptions>().BindConfiguration(ImportOptions.SectionName);
 builder.Services.AddImport();
-builder.Services.AddOptions<TranscriptionOptions>().BindConfiguration(TranscriptionOptions.SectionName);
-builder.Services.AddAssemblyAiTranscription();
-builder.Services.AddTatoebaSource();
-
-// BBC episodes need transcription; without an AssemblyAI key the source is not registered, so no episode
-// is failed for a configuration problem.
-if (!string.IsNullOrWhiteSpace(builder.Configuration[$"{AssemblyAiOptions.SectionName}:ApiKey"]))
-{
-    builder.Services.AddBbcSource();
-}
-
+builder.Services.AddLessonResources(builder.Configuration);
 builder.Services.AddHostedService<ImportWorker>();
 
 var app = builder.Build();
