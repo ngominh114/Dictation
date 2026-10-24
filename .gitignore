@@ -35,7 +35,7 @@ coverage*.info
 *.sln.docstates
 *.DotSettings.user
 
-# ---- Secrets & local config (API keys for AssemblyAI / Gladia) ----
+# ---- Secrets & local config (AssemblyAI API key) ----
 .env
 .env.*
 !.env.example

@@ -25,11 +25,11 @@ sources: []
   - **intent:** A background job imports new content from every configured source provider (BBC 6 Minute English, Tatoeba) and turns it into practice items of ordered sentences, each with its own audio range.
   - **success:**
     - After a job run, each new BBC episode is an item whose sentences each have text, start ms and end ms.
-    - Each new Tatoeba item holds N sentences with their own clip. Clips with an empty or disallowed licence are never stored.
+    - Each new Tatoeba item holds N sentences with their own clip. Clip licences are not checked (personal use only).
     - A second run adds no duplicates.
 - **CAP-2**
-  - **intent:** Transcription goes through one `ITranscriptionProvider` interface. AssemblyAI is implemented and registered. A Gladia adapter exists as an unregistered placeholder with its config section, showing where an alternative plugs in.
-  - **success:** AssemblyAI's recorded responses map to the normalized sentence list `{index, text, startMs, endMs}`. Swapping the provider needs only a DI registration change and config.
+  - **intent:** Transcription goes through one `ITranscriptionProvider` interface. AssemblyAI is implemented and registered.
+  - **success:** AssemblyAI's recorded responses map to the normalized sentence list `{index, text, startMs, endMs}`. Swapping the provider needs only a new adapter, a DI registration change and config.
 - **CAP-3**
   - **intent:** Ingestion tolerates failure: each item tracks its own status, transient errors are retried, and the job resumes after a restart.
   - **success:**
@@ -55,16 +55,14 @@ sources: []
 - Content only from public APIs:
   - BBC 6 Minute English: the RSS feed, whose URL is in config, plus each episode's page.
   - Tatoeba API.
-- Transcription only via AssemblyAI or Gladia. API formats are in the research companion.
+- Transcription only via AssemblyAI. API formats are in the research companion.
 - Personal, single-user, non-commercial use only. BBC terms allow personal use; most Tatoeba audio is CC BY-NC-ND. So:
   - no public re-hosting or redistribution of audio;
   - no modifying the audio;
 - The BBC audio sent to transcription is the same file that is played: the static `…_download.mp3` from the episode page, never the RSS enclosure. The enclosure has ad insertion and expiring URLs.
 - Sentence playback seeks within the original audio file, which both audio hosts allow via HTTP range requests. No server-side audio cutting.
 - Provider API keys are read from appsettings, set in the gitignored `appsettings.Local.json`, and never committed.
-- Stay within the free tiers:
-  - AssemblyAI: 5 concurrent jobs and 60 status polls per minute per transcript.
-  - Gladia: 3 concurrent jobs.
+- Stay within the AssemblyAI free tier: 5 concurrent jobs and 60 status polls per minute per transcript.
 - Each transcribed sentence is one practice segment, whatever its length. No splitting or merging.
 - Import is demo-sized: at most 5 entries per source per run (5 BBC episodes, 5 Tatoeba items), configurable.
 - Scope is small. Every addition must serve the capabilities above.

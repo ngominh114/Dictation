@@ -7,13 +7,10 @@ API formats: see the main report, section 2.
    - Optional: add `word_count=5-12` to keep sentences a sensible length for dictation.
 2. **Page through results** by following `paging.next` until `has_next` is false.
    - Stop after a configured number of sentences; the job does not need all of them (about 850k English sentences have audio).
-3. **Filter each sentence's `audios[]` by licence.**
-   - Keep an allowlist in config.
-   - An empty licence means "no reuse": always exclude it.
-   - Most English audio is `CC BY-NC-ND 3.0`, which is acceptable for personal, non-commercial use.
+3. **Take the first clip in `audios[]`.** Licences are not checked: the app is for personal, non-commercial use only (decided 2026-10-24). Most English audio is `CC BY-NC-ND 3.0`.
 4. **Build the audio URL from the id:** `https://api.tatoeba.org/v1/audios/{audio.id}/file`.
    - Do not use `download_url`; it returns 404.
-5. **Attribution is not stored** (personal use only); the licence is used only to filter clips.
+5. **Attribution is not stored** (personal use only).
 6. **Group N sentences (e.g. 10) into one practice item.** Each sentence becomes one segment with its own clip URL. No transcription is needed.
 7. **Deduplicate** on sentence `id` + audio `id`.
 

@@ -71,14 +71,15 @@ public sealed class ImportLessonsUseCase
         try
         {
             lesson = await _pipeline.RunAsync(lesson, ct).ConfigureAwait(false); // business steps
-            await _repository.TryAddAsync(lesson, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // Log identifiers only, never payload content.
             _logger.LogWarning(ex, "Import failed for {Source}/{ExternalId}", lesson.Source, lesson.ExternalId);
             lesson.Fail();
-            await _repository.TryAddAsync(lesson, ct).ConfigureAwait(false);
         }
+
+        // Saved once, finished or failed. A cancelled lesson is not saved, so the next run retries it.
+        await _repository.TryAddAsync(lesson, ct).ConfigureAwait(false);
     }
 }

@@ -1,15 +1,15 @@
-# Build notes: AssemblyAI (default) and Gladia (alternative)
+# Build notes: AssemblyAI
 
-API formats: see the main report, sections 3–4.
+API formats: see the main report, section 3.
 
-## Common shape (one interface, two implementations)
+## Common shape (one interface; AssemblyAI is the only implementation)
 ```
 SubmitAsync(audioUrl, language) -> providerJobId
 GetStatusAsync(providerJobId)   -> Pending | Processing | Completed | Failed(reason)
 GetSentencesAsync(providerJobId) -> [ {index, text, startMs, endMs} ]
 ```
-- Both providers fetch the audio from a public URL themselves, so no upload is needed.
-- Neither has a maintained .NET SDK (AssemblyAI's C# SDK was archived 2025-04-01). Use plain `HttpClient` with your own DTOs.
+- The provider fetches the audio from a public URL itself, so no upload is needed.
+- There is no maintained .NET SDK (AssemblyAI's C# SDK was archived 2025-04-01). Use plain `HttpClient` with your own DTOs.
 - Run it as persisted job state rather than a blocking wait:
   - one tick submits and stores the job id;
   - later ticks poll once per tick until the job completes or fails;
@@ -26,20 +26,6 @@ GetSentencesAsync(providerJobId) -> [ {index, text, startMs, endMs} ]
   - Max 5 GB / 10 h per file.
 - **Cost:** $50 free credit, $0.15–0.21 per audio hour, which is plenty for a demo.
 - **Open:** whether `language_code` should be `en` or `en_us`. Confirm with the first call.
-
-## Gladia
-- **Submit:** `POST /v2/pre-recorded` with `{audio_url, language_config:{languages:["en"]}}`. Header `x-gladia-key: <key>`. The response is `{id, result_url}`.
-- **Poll:** use the returned `result_url`. The docs show both `/v2/pre-recorded/{id}` and `/v2/transcription/{id}`, so don't hard-code either.
-- **Statuses:** `queued`, `processing`, `done`, `error`.
-- **Sentences:** not provided with timings; `sentences:true` returns plain strings. Build them yourself:
-  - flatten `result.transcription.utterances[].words[]` (the word text is in `word`);
-  - start a new sentence after a word ending in `.`, `?` or `!`;
-  - `startMs = firstWord.start * 1000`, `endMs = lastWord.end * 1000` (times are float seconds).
-- **Limits:**
-  - Free tier allows 3 concurrent jobs; going over returns `429`, so retry with backoff.
-  - Max 135 min / 1000 MB per file.
-  - Errors: `400` invalid request, `401` bad key, `422` bad parameters.
-- **Cost:** €50 free credit.
 
 ## Error handling to plan for
 - Provider `error`/failed status: mark the lesson Failed with the reason; allow a manual retry.

@@ -7,7 +7,7 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
 - A source adapter parses what the source sends, whatever the format, into its own `internal` DTOs (`{Source}Dtos.cs`), then maps them to a `Discovered` lesson in a private `ToLesson` via `Lesson.CreateDiscovered` and `AddSegment`. No model sits between the DTOs and `Lesson`. Transcription adapters map their own `internal` DTOs to `TranscribedSentence`.
 - Throw `ImportException(message)` for problems the provider signals or an unexpected status code. Other exceptions may propagate; any failure fails the lesson or skips the source (AD-5).
 - Never send a request to an audio URL (no `GET`, `HEAD` or stream). Never call a provider upload endpoint.
-- Declare a constant lowercase key (`bbc`, `tatoeba`, `assemblyai`, `gladia`).
+- Declare a constant lowercase key (`bbc`, `tatoeba`, `assemblyai`).
 - Map the canonical language (`en`) to the provider's code. Never read `Import:Languages`.
 
 ## BBC — `BbcContentSource` (key `bbc`)
@@ -35,15 +35,6 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
 - **Sentences:** `GET /v2/transcript/{id}/sentences`. Times are already integer ms.
 - **Auth:** header `authorization: {Transcription:AssemblyAi:ApiKey}`, no `Bearer`.
 - **Language:** sends `language_code: "en"`; if the first real call needs `en_us`, change it inside this adapter only.
-
-## Gladia — `GladiaTranscriptionProvider` (key `gladia`)
-
-Placeholder, not registered in DI (AD-6). Every method throws `ImportException("Gladia is a placeholder and not implemented")`. The rules below are reference for a future implementation.
-
-- **Submit:** `POST /v2/pre-recorded` with `{ audio_url, language_config }`.
-- **Poll:** `GET /v2/pre-recorded/{jobId}`.
-- **Sentences:** flatten `utterances[].words[]` and end a sentence after a word ending in `.`, `?` or `!`. `StartMs = floor(first.start × 1000)`, `EndMs = ceil(last.end × 1000)`.
-- **Concurrency:** `MaxConcurrentJobs` default 3.
 
 ## Transcription adapters
 

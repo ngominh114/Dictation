@@ -7,7 +7,7 @@ paradigm: 'Clean Architecture, small; Adapter pattern for external APIs; generic
 scope: 'Whole Dictation Practice app: content import, transcription, storage, REST API, web UI'
 status: final
 created: '2026-10-22'
-updated: '2026-10-23'
+updated: '2026-10-24'
 binds: [CAP-1, CAP-2, CAP-3, CAP-4, CAP-5, CAP-6, CAP-7]
 sources: []
 companions:
@@ -28,12 +28,13 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 | Project | Holds |
 | --- | --- |
 | `Dictation.Domain` | `Lesson`, `Segment`, `LessonStatus`; no package references |
-| `Dictation.Application` | One folder per use case. `Import/`: `ImportLessonsUseCase`, `LessonPipeline`, `Steps/`, `Abstractions/` (interfaces for adapters and the repository), `Configurations/` (options), `ImportException`. `Lessons/`: `Queries/` with one folder per query (query, handler, response type), plus `Abstractions/` (`ILessonRepository`). Shared: `Pipelines/` (`Pipeline<T>`, `IPipelineStep<T>`) |
+| `Dictation.Application` | One folder per use case. `Import/`: `ImportLessonsUseCase`, `LessonPipeline/` (`LessonPipeline`, `Steps/`), `Abstractions/` (interfaces for adapters and the repository), `Configurations/` (options), `ImportException`. `Lessons/`: `Queries/` with one folder per query (query, handler, response type), plus `Abstractions/` (`ILessonRepository`). Shared: `Common/Pipelines/` (`Pipeline<T>`, `IPipelineStep<T>`) |
 | `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonImportRepository`); `LessonRepository` |
 | `Dictation.Api` | `Program.cs`, Minimal API endpoints, `ImportWorker`, `wwwroot` UI |
-| `Dictation.Tests` | Unit tests of our own behaviour: domain, pipeline and use case with fakes |
+| `Dictation.Tests` | Unit tests: domain, pipeline steps and use case with fakes; adapters against a stubbed HTTP handler |
+| `Dictation.IntegrationTests` | Integration tests: app ↔ SQLite with the real migrations, and the HTTP endpoints via `WebApplicationFactory` |
 
-**Built:** the Tatoeba and BBC imports end to end, with AssemblyAI transcription, and the REST endpoints. **Planned:** the Gladia placeholder and the UI.
+**Built:** the Tatoeba and BBC imports end to end, with AssemblyAI transcription, the REST endpoints and the web UI.
 
 **Import flow:**
 
@@ -51,7 +52,7 @@ graph LR
 ### AD-1 — Dependencies point inward; things plug in
 
 - `Domain` references nothing. `Application` references only `Domain`, `Microsoft.Extensions.*.Abstractions` and `MediatR`. `Infrastructure` references only `Application`. Adapters never reference each other or the repository. Project references enforce this.
-- Sources and providers have constant lowercase keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`), not enums.
+- Sources and providers have constant lowercase keys (`bbc`, `tatoeba`, `assemblyai`), not enums.
 - Add a source = adapter + DI registration + config. Add a step = step + one line in `LessonPipeline.ConfigureSteps`.
 
 ### AD-2 — Sources return `Discovered` lessons
@@ -95,14 +96,15 @@ graph LR
 
 ### AD-5 — Any failure is final
 
-- Any exception while importing an item marks its lesson `Failed` and saves it, so the exists check skips it from then on. Only identifiers are logged, never payload content; no exception escapes one item.
+- Any exception while running an item's pipeline marks its lesson `Failed` and saves it, so the exists check skips it from then on. Only identifiers are logged, never payload content. A cancelled item is not saved, so the next run retries it.
+- A database error while saving stops that source's run (the worker logs it): continuing would keep paying for transcriptions that cannot be stored. The unsaved lesson is retried on the next run.
 - Any exception while fetching skips that source for the run, with a log entry.
 - One exception type, `ImportException(message)`: adapters throw it for problems the provider signals (error status, empty transcript), and `Pipeline<T>` wraps any step error in it, naming the step type in the message.
 - HTTP calls use the standard resilience handler, which retries inside the call. Submit is never auto-retried (`Retry.DisableForUnsafeHttpMethods()`).
 
 ### AD-6 — One transcription provider
 
-- Only `AssemblyAiTranscriptionProvider` is registered; `TranscribeStep` takes it by constructor. `GladiaTranscriptionProvider` is an unregistered placeholder with a `Transcription:Gladia` config section, for demonstration.
+- Only `AssemblyAiTranscriptionProvider` is registered; `TranscribeStep` takes it by constructor. Another provider plugs in as a new adapter plus a DI registration change.
 - `TranscribeStep` submits the audio, records the provider key and job id with `StartTranscription`, asks the provider for the sentences (the AssemblyAI adapter polls every `Transcription:AssemblyAi:PollIntervalSeconds`, default 5, until the job is done), then adds one segment per sentence. A job still polling when the app stops is lost; the next start submits the episode again.
 - Episodes are imported one at a time, so at most one job is open (AssemblyAI allows 5).
 - Without `Transcription:AssemblyAi:ApiKey`, the BBC source is not registered, so no episode fails for a missing key.
@@ -118,13 +120,12 @@ graph LR
 - Lesson detail includes each segment's text; the UI keeps it hidden until the transcript button is pressed.
 - Each endpoint sends one query (`GetLessonsQuery`, `GetLessonQuery`) through `ISender`; each query has its own handler in Application and its own response type (`GetLessonsResponse`, `GetLessonResponse`). The detail handler returns null for a missing or non-`Ready` lesson, and the endpoint answers `response is null ? NotFound() : Ok(response)`. The list endpoint replaces an out-of-range `page` or `pageSize` with its default before sending. Handlers read through `ILessonRepository`; `LessonRepository` in Infrastructure answers from `DictationDbContext` with `AsNoTracking()`, filtered to `Ready`.
 
-### AD-9 — Unit tests of our behaviour only
+### AD-9 — Few tests, on business behaviour and real boundaries
 
-- For now the suite is unit tests only: no API host, no database, no network. Integration tests come later.
-
-- Adapters (sources, transcription) are not unit tested; they are checked by running the app against the real services.
-- Tests cover the happy path and that any error, whatever its kind, fails the lesson and later runs skip it.
-- The domain, `Pipeline<T>`, each step and `ImportLessonsUseCase` are tested with in-memory fakes, including one "fits every source" test: a lesson with segments skips `TranscribeStep` and ends `Ready`; one with no audio and no segments ends `Failed`.
+- Tests stay few and simple: each unit gets its main happy path plus every failure that would cause a real production issue (endless polling, duplicate imports, one source stopping the run). No tests of DI wiring or options binding.
+- **Unit tests** (`Dictation.Tests`, no network, no host): the domain, each step and `ImportLessonsUseCase` with in-memory fakes, including one "fits every source" test (a lesson with segments skips `TranscribeStep` and ends `Ready`; one with no audio and no segments ends `Failed`). Adapters are tested against a stubbed `HttpMessageHandler` with recorded-style payloads.
+- **Integration tests** (`Dictation.IntegrationTests`) cover only two boundaries: app ↔ database (a temporary SQLite file with the real migrations, including a check that the model has no pending migration) and the HTTP endpoints (`WebApplicationFactory<Program>`, import disabled).
+- No test calls a real external service and there are no end-to-end import tests; the HTTP client setup (retries, headers) is checked by running the app.
 
 ## Conventions
 
@@ -133,7 +134,7 @@ graph LR
 | Naming | `{Provider}{Role}` adapters, `{Work}Step` steps, `I`-prefixed interfaces, `internal` `{Provider}…Dto` |
 | Data | Integer ms; UTC `DateTime`; `Guid` ids; camelCase JSON, nulls omitted; enums persisted by name |
 | Errors | `ProblemDetails` for every HTTP error (detail in Development only) |
-| Logging | Structured; import logs carry `LessonId` and `Source`; never headers or keys |
+| Logging | Structured; import logs carry `Source` and `ExternalId`; never headers or keys |
 | Config | Typed options under `Sources:*`, `Transcription:*`, `Import:*`; keys in gitignored `appsettings.Local.json` |
 | Code | `async` I/O with `CancellationToken`; typed `HttpClient`s with the standard resilience handler; Kestrel on `localhost` |
 | Startup | `MigrateAsync()` before `app.Run()`, never `EnsureCreated`; SQLite in WAL mode |
@@ -156,16 +157,17 @@ graph LR
 
 ```text
 src/Dictation.Domain/          # Lessons/
-src/Dictation.Application/     # Import/ (ImportLessonsUseCase, LessonPipeline, Steps/, Abstractions/, Configurations/); Lessons/ (queries); Pipelines/ (shared)
-src/Dictation.Infrastructure/  # ContentSources/*, Transcription/* (AssemblyAi, Gladia placeholder), Persistence/
+src/Dictation.Application/     # Import/ (ImportLessonsUseCase, LessonPipeline/Steps/, Abstractions/, Configurations/); Lessons/ (queries); Common/Pipelines/ (shared)
+src/Dictation.Infrastructure/  # ContentSources/*, Transcription/AssemblyAi/, Persistence/
 src/Dictation.Api/             # Program.cs, Endpoints/, ImportWorker, wwwroot/
-tests/Dictation.Tests/         # Domain/, Application/, Support/ (fakes)
+tests/Dictation.Tests/         # Domain/, Application/, Infrastructure/ (adapters), Support/ (fakes)
+tests/Dictation.IntegrationTests/  # Api/ (endpoints), Infrastructure/ (database), Support/
 ```
 
-Runs locally only (`dotnet run --project src/Dictation.Api`); the SQLite file is gitignored.
+Runs locally only (`dotnet run --project src/Dictation.Api`); the SQLite file (`src/Dictation.Api/dictation.db`) is gitignored.
 
 ## Deferred
 
-- Retrying failed lessons; a separate Worker host (only the host changes); implementing Gladia.
+- Retrying failed lessons; a separate Worker host (only the host changes).
 - Webhooks; Docker, cloud, CI; auth; metrics and tracing; non-English sources.
 - Re-check provider API formats before the adapter stories if past 2026-11-22.

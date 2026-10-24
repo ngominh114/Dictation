@@ -17,6 +17,8 @@ claims_unverified: 6
 
 Request and response formats for the APIs the app uses, as observed live or read from the official docs on 2026-10-22. Samples are trimmed to the fields that matter.
 
+> **Since this research (2026-10-24):** Gladia was dropped; AssemblyAI is the only transcription provider, and section 4 is kept for reference only. Tatoeba clip licences are not filtered (personal use only).
+
 | Provider | Role | Protocol | Auth |
 |---|---|---|---|
 | BBC 6 Minute English | Episode list (RSS) and episode page (audio + transcript) | RSS 2.0 XML + HTML | none |
