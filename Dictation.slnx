@@ -6,6 +6,7 @@
     <Project Path="src/Dictation.Api/Dictation.Api.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Dictation.IntegrationTests/Dictation.IntegrationTests.csproj" />
     <Project Path="tests/Dictation.Tests/Dictation.Tests.csproj" />
   </Folder>
 </Solution>

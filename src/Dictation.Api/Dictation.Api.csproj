@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Dictation.Tests" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Dictation.Application\Dictation.Application.csproj" />
     <ProjectReference Include="..\Dictation.Infrastructure\Dictation.Infrastructure.csproj" />
   </ItemGroup>
