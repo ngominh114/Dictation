@@ -1,4 +1,4 @@
-namespace Dictation.Infrastructure.Sources.Bbc;
+namespace Dictation.Infrastructure.ContentSources.Bbc;
 
 public sealed class BbcOptions
 {

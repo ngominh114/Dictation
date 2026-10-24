@@ -1,4 +1,4 @@
-using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Dictation.Domain.Lessons;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dictation.Infrastructure.Persistence;
 
-/// <summary>The SQLite database: the lesson mapping, and the <see cref="ILessonRepository"/> the import uses.</summary>
+/// <summary>The SQLite database: the lesson mapping, and the <see cref="ILessonImportRepository"/> the import uses.</summary>
 public sealed class DictationDbContext(DbContextOptions<DictationDbContext> options)
-    : DbContext(options), ILessonRepository
+    : DbContext(options), ILessonImportRepository
 {
     // SQLITE_CONSTRAINT, with its PRIMARYKEY and UNIQUE extended codes.
     private const int SqliteConstraint = 19;

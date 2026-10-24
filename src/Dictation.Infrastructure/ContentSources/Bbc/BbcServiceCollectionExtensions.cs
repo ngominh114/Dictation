@@ -1,7 +1,7 @@
-using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dictation.Infrastructure.Sources.Bbc;
+namespace Dictation.Infrastructure.ContentSources.Bbc;
 
 public static class BbcServiceCollectionExtensions
 {

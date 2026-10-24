@@ -1,4 +1,4 @@
-namespace Dictation.Application.Import;
+namespace Dictation.Application.Import.Abstractions;
 
 /// <summary>One transcribed sentence, times in integer milliseconds (<see cref="EndMs"/> exclusive).</summary>
 public sealed record TranscribedSentence(string Text, int StartMs, int EndMs);

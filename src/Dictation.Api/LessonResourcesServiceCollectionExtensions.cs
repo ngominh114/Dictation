@@ -1,5 +1,5 @@
-using Dictation.Infrastructure.Sources.Bbc;
-using Dictation.Infrastructure.Sources.Tatoeba;
+using Dictation.Infrastructure.ContentSources.Bbc;
+using Dictation.Infrastructure.ContentSources.Tatoeba;
 using Dictation.Infrastructure.Transcription.AssemblyAi;
 
 namespace Dictation.Api;

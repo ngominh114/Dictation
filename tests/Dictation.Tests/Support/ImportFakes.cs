@@ -1,4 +1,6 @@
 using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
+using Dictation.Application.Import.Configurations;
 using Dictation.Application.Pipelines;
 using Dictation.Domain.Lessons;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -6,8 +8,8 @@ using Microsoft.Extensions.Options;
 
 namespace Dictation.Tests.Support;
 
-/// <summary>In-memory <see cref="ILessonRepository"/>.</summary>
-public sealed class InMemoryLessonRepository : ILessonRepository
+/// <summary>In-memory <see cref="ILessonImportRepository"/>.</summary>
+public sealed class InMemoryLessonImportRepository : ILessonImportRepository
 {
     public List<Lesson> Lessons { get; } = [];
 
@@ -69,7 +71,7 @@ public static class TestImport
     public static LessonPipeline Pipeline(ITranscriptionProvider? provider = null) =>
         new(provider ?? new FakeTranscriptionProvider());
 
-    public static ImportLessonsUseCase UseCase(InMemoryLessonRepository repository, Pipeline<Lesson> pipeline) =>
+    public static ImportLessonsUseCase UseCase(InMemoryLessonImportRepository repository, Pipeline<Lesson> pipeline) =>
         new(
             repository,
             pipeline,

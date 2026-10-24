@@ -1,4 +1,4 @@
-using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 
 namespace Dictation.Tests.Support;
 

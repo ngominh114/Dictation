@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

@@ -1,11 +1,12 @@
 using System.Globalization;
 using System.Net.Http.Json;
 using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Dictation.Domain.Lessons;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Dictation.Infrastructure.Sources.Tatoeba;
+namespace Dictation.Infrastructure.ContentSources.Tatoeba;
 
 /// <summary>Tatoeba source adapter (key <c>tatoeba</c>).</summary>
 public sealed class TatoebaContentSource : IContentSource

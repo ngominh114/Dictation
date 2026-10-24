@@ -1,4 +1,4 @@
-namespace Dictation.Application.Import;
+namespace Dictation.Application.Import.Configurations;
 
 public sealed class ImportOptions
 {

@@ -1,3 +1,5 @@
+using Dictation.Application.Import.Abstractions;
+using Dictation.Application.Import.Configurations;
 using Dictation.Application.Pipelines;
 using Dictation.Domain.Lessons;
 using Microsoft.Extensions.Logging;
@@ -11,13 +13,13 @@ namespace Dictation.Application.Import;
 /// </summary>
 public sealed class ImportLessonsUseCase
 {
-    private readonly ILessonRepository _repository;
+    private readonly ILessonImportRepository _repository;
     private readonly Pipeline<Lesson> _pipeline;
     private readonly IOptions<ImportOptions> _options;
     private readonly ILogger<ImportLessonsUseCase> _logger;
 
     public ImportLessonsUseCase(
-        ILessonRepository repository,
+        ILessonImportRepository repository,
         Pipeline<Lesson> pipeline,
         IOptions<ImportOptions> options,
         ILogger<ImportLessonsUseCase> logger)

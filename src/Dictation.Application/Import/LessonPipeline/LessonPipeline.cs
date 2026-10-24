@@ -1,3 +1,4 @@
+using Dictation.Application.Import.Abstractions;
 using Dictation.Application.Import.Steps;
 using Dictation.Application.Pipelines;
 using Dictation.Domain.Lessons;

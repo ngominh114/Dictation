@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Dictation.Infrastructure.Sources.Tatoeba;
+namespace Dictation.Infrastructure.ContentSources.Tatoeba;
 
 internal sealed class TatoebaSentencesResponseDto
 {

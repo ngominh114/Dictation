@@ -1,3 +1,4 @@
+using Dictation.Application.Import.Configurations;
 using Dictation.Application.Pipelines;
 using Dictation.Domain.Lessons;
 using Microsoft.Extensions.DependencyInjection;

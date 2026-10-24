@@ -1,4 +1,4 @@
-namespace Dictation.Infrastructure.Sources.Tatoeba;
+namespace Dictation.Infrastructure.ContentSources.Tatoeba;
 
 public sealed class TatoebaOptions
 {

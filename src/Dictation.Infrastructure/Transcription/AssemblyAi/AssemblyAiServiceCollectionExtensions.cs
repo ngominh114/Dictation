@@ -1,4 +1,4 @@
-using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;

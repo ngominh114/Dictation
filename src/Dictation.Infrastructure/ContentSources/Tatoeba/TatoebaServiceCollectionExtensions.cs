@@ -1,9 +1,9 @@
-using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Dictation.Infrastructure.Sources.Tatoeba;
+namespace Dictation.Infrastructure.ContentSources.Tatoeba;
 
 public static class TatoebaServiceCollectionExtensions
 {

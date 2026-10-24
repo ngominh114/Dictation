@@ -3,11 +3,12 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Dictation.Domain.Lessons;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Dictation.Infrastructure.Sources.Bbc;
+namespace Dictation.Infrastructure.ContentSources.Bbc;
 
 /// <summary>BBC 6 Minute English source adapter (key <c>bbc</c>).</summary>
 public sealed partial class BbcContentSource : IContentSource

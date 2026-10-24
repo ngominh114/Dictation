@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using Dictation.Api;
 using Dictation.Api.Endpoints;
 using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
+using Dictation.Application.Import.Configurations;
 using Dictation.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +19,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 // The connection string is read when a context is created, so a test host's override is honoured.
 builder.Services.AddDbContext<DictationDbContext>((provider, options) =>
     options.UseSqlite(provider.GetRequiredService<IConfiguration>().GetConnectionString("Dictation")));
-builder.Services.AddScoped<ILessonRepository>(provider => provider.GetRequiredService<DictationDbContext>());
+builder.Services.AddScoped<ILessonImportRepository>(provider => provider.GetRequiredService<DictationDbContext>());
 builder.Services.AddLessonQueries();
 
 builder.Services.AddOptions<ImportOptions>().BindConfiguration(ImportOptions.SectionName);

@@ -1,8 +1,8 @@
 using Dictation.Domain.Lessons;
 
-namespace Dictation.Application.Import;
+namespace Dictation.Application.Import.Abstractions;
 
-public interface ILessonRepository
+public interface ILessonImportRepository
 {
     /// <summary>Lesson <c>ExternalId</c>s plus segment <c>ExternalKey</c>s stored for <paramref name="source"/>.</summary>
     Task<IReadOnlySet<string>> GetKnownKeysAsync(string source, CancellationToken ct);

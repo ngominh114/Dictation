@@ -1,4 +1,6 @@
 using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
+using Dictation.Application.Import.Configurations;
 using Microsoft.Extensions.Options;
 
 namespace Dictation.Api;

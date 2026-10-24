@@ -10,7 +10,7 @@ public sealed class ImportLessonsUseCaseTests
     [Fact]
     public async Task Fits_every_source_lesson_with_segments_becomes_ready_and_lesson_with_nothing_fails()
     {
-        var repository = new InMemoryLessonRepository();
+        var repository = new InMemoryLessonImportRepository();
         var withSegments = TestLessons.Create();
         withSegments.AddSentence("1:10");
         var empty = TestLessons.Create();
@@ -26,7 +26,7 @@ public sealed class ImportLessonsUseCaseTests
     [Fact]
     public async Task Step_failure_stores_the_lesson_as_failed_and_later_runs_skip_it()
     {
-        var repository = new InMemoryLessonRepository();
+        var repository = new InMemoryLessonImportRepository();
         var audio = TestLessons.CreateAudio();
         var failing = new StubStep(_ => true, _ => throw new InvalidOperationException("boom"));
         var useCase = TestImport.UseCase(repository, new StubPipeline(failing));

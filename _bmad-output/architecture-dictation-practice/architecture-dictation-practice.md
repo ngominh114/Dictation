@@ -23,13 +23,13 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 
 ## Design Paradigm
 
-**Clean Architecture, kept small.** Four layers (Domain, Application, Infrastructure, Api) with dependencies pointing inward. `Application` defines the interfaces it needs (`IContentSource`, `ITranscriptionProvider`, `ILessonRepository`). Each external API gets one **adapter** in `Infrastructure` (Adapter pattern) that implements the interface and translates that API's DTOs to domain types. The import use case is a plain service. Reads use the **Mediator** pattern: an endpoint sends a query through MediatR's `ISender`, which forwards it to its handler.
+**Clean Architecture, kept small.** Four layers (Domain, Application, Infrastructure, Api) with dependencies pointing inward. `Application` defines the interfaces it needs (`IContentSource`, `ITranscriptionProvider`, `ILessonImportRepository`). Each external API gets one **adapter** in `Infrastructure` (Adapter pattern) that implements the interface and translates that API's DTOs to domain types. The import use case is a plain service. Reads use the **Mediator** pattern: an endpoint sends a query through MediatR's `ISender`, which forwards it to its handler.
 
 | Project | Holds |
 | --- | --- |
 | `Dictation.Domain` | `Lesson`, `Segment`, `LessonStatus`; no package references |
-| `Dictation.Application` | `Pipeline<T>` and `IPipelineStep<T>`; import (`ImportLessonsUseCase`, `LessonPipeline`, `TranscribeStep`, `FinishStep`); lesson queries and their result records (`Lessons/`); interfaces for adapters and the repository; `ImportException`; options |
-| `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonRepository`); `LessonQueryHandlers` |
+| `Dictation.Application` | One folder per use case. `Import/`: `ImportLessonsUseCase`, `LessonPipeline`, `Steps/`, `Abstractions/` (interfaces for adapters and the repository), `Configurations/` (options), `ImportException`. `Lessons/`: the lesson queries and their result records. Shared: `Pipelines/` (`Pipeline<T>`, `IPipelineStep<T>`) |
+| `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonImportRepository`); `LessonQueryHandlers` |
 | `Dictation.Api` | `Program.cs`, Minimal API endpoints, `ImportWorker`, `wwwroot` UI |
 | `Dictation.Tests` | Unit tests of our own behaviour: domain, pipeline and use case with fakes |
 
@@ -157,8 +157,8 @@ graph LR
 
 ```text
 src/Dictation.Domain/          # Lessons/
-src/Dictation.Application/     # Pipelines/; Import/ (ImportLessonsUseCase, LessonPipeline, Steps/, interfaces, options); Lessons/ (queries)
-src/Dictation.Infrastructure/  # Sources/*, Transcription/* (AssemblyAi, Gladia placeholder), Persistence/
+src/Dictation.Application/     # Import/ (ImportLessonsUseCase, LessonPipeline, Steps/, Abstractions/, Configurations/); Lessons/ (queries); Pipelines/ (shared)
+src/Dictation.Infrastructure/  # ContentSources/*, Transcription/* (AssemblyAi, Gladia placeholder), Persistence/
 src/Dictation.Api/             # Program.cs, Endpoints/, ImportWorker, wwwroot/
 tests/Dictation.Tests/         # Domain/, Application/, Support/ (fakes)
 ```

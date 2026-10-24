@@ -1,4 +1,4 @@
-using Dictation.Application.Import;
+using Dictation.Application.Import.Abstractions;
 using Dictation.Domain.Lessons;
 using Dictation.Tests.Support;
 
