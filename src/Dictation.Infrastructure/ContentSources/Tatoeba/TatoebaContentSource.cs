@@ -39,7 +39,7 @@ public sealed class TatoebaContentSource : IContentSource
 
     public IReadOnlyCollection<string> SupportedLanguages { get; } = ["en"];
 
-    public async Task<IReadOnlyList<SourceItem>> FetchAsync(
+    public async Task<IReadOnlyList<Lesson>> FetchAsync(
         string language,
         IReadOnlySet<string> knownKeys,
         int max,
@@ -84,63 +84,59 @@ public sealed class TatoebaContentSource : IContentSource
                     continue;
                 }
 
-                var key = string.Create(CultureInfo.InvariantCulture, $"{sentence.Id}:{clip.Id}");
+                var key = SegmentKey(sentence, clip);
                 if (knownKeys.Contains(key) || !seenKeys.Add(key))
                 {
                     continue;
                 }
 
-                picked.Add(new PickedSentence(sentence.Id, clip.Id, sentence.Text.Trim(), key));
+                picked.Add(new PickedSentence(sentence, clip));
             }
 
             url = response.Paging is { HasNext: not false, Next: { Length: > 0 } next } ? next : null;
         }
 
-        var groups = new List<SourceItem>(max);
+        var lessons = new List<Lesson>(max);
 
         // A trailing partial group is not created.
-        for (var start = 0; start + groupSize <= picked.Count && groups.Count < max; start += groupSize)
+        for (var start = 0; start + groupSize <= picked.Count && lessons.Count < max; start += groupSize)
         {
             var group = picked.GetRange(start, groupSize);
-            var externalId = string.Join(",", group.Select(s => s.SentenceId.ToString(CultureInfo.InvariantCulture)));
+            var externalId = string.Join(",", group.Select(p => p.Sentence.Id.ToString(CultureInfo.InvariantCulture)));
             if (!knownKeys.Contains(externalId))
             {
-                groups.Add(new TatoebaGroup(externalId, baseUrl, group));
+                lessons.Add(ToLesson(externalId, baseUrl, group));
             }
         }
 
         _logger.LogInformation(
-            "Tatoeba returned {SentenceCount} new sentence(s), grouped into {GroupCount} item(s)",
+            "Tatoeba returned {SentenceCount} new sentence(s), grouped into {GroupCount} lesson(s)",
             picked.Count,
-            groups.Count);
+            lessons.Count);
 
-        return groups;
+        return lessons;
     }
 
-    public Lesson ToLesson(SourceItem item)
+    /// <summary>One group of sentences becomes one lesson, one segment per sentence.</summary>
+    private static Lesson ToLesson(string externalId, string baseUrl, IReadOnlyList<PickedSentence> group)
     {
-        if (item is not TatoebaGroup group)
-        {
-            throw new ArgumentException($"Not a Tatoeba item: {item.GetType().Name}.", nameof(item));
-        }
-
-        var first = group.Sentences[0].SentenceId.ToString(CultureInfo.InvariantCulture);
-        var last = group.Sentences[^1].SentenceId.ToString(CultureInfo.InvariantCulture);
+        var first = group[0].Sentence.Id.ToString(CultureInfo.InvariantCulture);
+        var last = group[^1].Sentence.Id.ToString(CultureInfo.InvariantCulture);
         var lesson = Lesson.CreateDiscovered(
             SourceKey,
-            group.ExternalId,
+            externalId,
             $"Tatoeba #{first}–#{last}",
             "en",
             $"https://tatoeba.org/en/sentences/show/{first}",
             sourceAudioUrl: null,
             DateTime.UtcNow);
 
-        foreach (var sentence in group.Sentences)
+        foreach (var (sentence, clip) in group)
         {
             lesson.AddSegment(
-                sentence.ExternalKey,
-                sentence.Text,
-                string.Create(CultureInfo.InvariantCulture, $"{group.BaseUrl}/v1/audios/{sentence.AudioId}/file"),
+                SegmentKey(sentence, clip),
+                sentence.Text!.Trim(),
+                string.Create(CultureInfo.InvariantCulture, $"{baseUrl}/v1/audios/{clip.Id}/file"),
                 startMs: 0,
                 endMs: null);
         }
@@ -148,7 +144,10 @@ public sealed class TatoebaContentSource : IContentSource
         return lesson;
     }
 
-    private async Task<TatoebaSentencesResponseDto> GetPageAsync(string url, CancellationToken ct)
+    private static string SegmentKey(TatoebaSentenceDto sentence, TatoebaAudioDto clip) =>
+        string.Create(CultureInfo.InvariantCulture, $"{sentence.Id}:{clip.Id}");
+
+    private async Task<TatoebaSentencesPageDto> GetPageAsync(string url, CancellationToken ct)
     {
         using var response = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct)
             .ConfigureAwait(false);
@@ -159,7 +158,7 @@ public sealed class TatoebaContentSource : IContentSource
                 $"Tatoeba returned unexpected status {(int)response.StatusCode} ({response.StatusCode}).");
         }
 
-        var body = await response.Content.ReadFromJsonAsync<TatoebaSentencesResponseDto>(ct).ConfigureAwait(false);
+        var body = await response.Content.ReadFromJsonAsync<TatoebaSentencesPageDto>(ct).ConfigureAwait(false);
         return body ?? throw new ImportException("Tatoeba returned an empty response.");
     }
 
@@ -190,8 +189,6 @@ public sealed class TatoebaContentSource : IContentSource
         return DefaultBaseUrl;
     }
 
-    private sealed record PickedSentence(long SentenceId, long AudioId, string Text, string ExternalKey);
-
-    private sealed record TatoebaGroup(string ExternalId, string BaseUrl, IReadOnlyList<PickedSentence> Sentences)
-        : SourceItem(ExternalId);
+    /// <summary>A new sentence and the clip chosen for it.</summary>
+    private sealed record PickedSentence(TatoebaSentenceDto Sentence, TatoebaAudioDto Clip);
 }

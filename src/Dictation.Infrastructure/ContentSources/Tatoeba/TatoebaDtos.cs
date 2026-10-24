@@ -2,7 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Dictation.Infrastructure.ContentSources.Tatoeba;
 
-internal sealed class TatoebaSentencesResponseDto
+/// <summary>One page of the Tatoeba API's sentences response, as sent.</summary>
+internal sealed class TatoebaSentencesPageDto
 {
     [JsonPropertyName("data")]
     public List<TatoebaSentenceDto>? Data { get; set; }

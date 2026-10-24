@@ -39,10 +39,9 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 
 ```mermaid
 graph LR
-  S[Source.FetchAsync] -->|new items| E{Already stored?}
+  S[Source.FetchAsync] -->|new lessons| E{Already stored?}
   E -->|yes| X[Skip]
-  E -->|no| M[Source.ToLesson]
-  M --> P[Pipeline: transcribe → finish]
+  E -->|no| P[Pipeline: transcribe → finish]
   P -->|segments| R[Save Ready]
   P -->|nothing to practise or error| F[Save Failed]
 ```
@@ -55,10 +54,10 @@ graph LR
 - Sources and providers have constant lowercase keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`), not enums.
 - Add a source = adapter + DI registration + config. Add a step = step + one line in `LessonPipeline.ConfigureSteps`.
 
-### AD-2 — Sources fetch items; adapters map them to `Lesson`s
+### AD-2 — Sources return `Discovered` lessons
 
-- `IContentSource.FetchAsync(language, knownKeys, max, ct)` returns up to `Import:MaxPerSource` (5) **new** items, each a `SourceItem(ExternalId)` subtype private to the adapter. Known keys are passed so sources skip sentences already stored.
-- `IContentSource.ToLesson(item)` maps one item to a `Discovered` lesson with `Lesson.CreateDiscovered(...)` and `AddSegment(...)`, filling in whatever its source has (BBC: `SourceAudioUrl`; Tatoeba: segments).
+- `IContentSource.FetchAsync(language, knownKeys, max, ct)` returns up to `Import:MaxPerSource` (5) **new** `Discovered` lessons. Known keys are passed so sources skip sentences already stored.
+- The adapter maps its own data to each lesson with `Lesson.CreateDiscovered(...)` and `AddSegment(...)`, filling in whatever its source has (BBC: `SourceAudioUrl`; Tatoeba: segments). An item it cannot map is skipped inside `FetchAsync`.
 - One segment shape for every source: `Segment { Index, ExternalKey?, Text, AudioUrl, StartMs, EndMs? }`. `Index` is 0-based and assigned by `Lesson`. One sentence = one segment. `EndMs` is exclusive; `null` means play to the end of the clip.
 - Unique indexes on `(Source, ExternalId)` and `(Source, Segment.ExternalKey)`. A violation skips that lesson without failing the run.
 - `Lesson.Language` stores `en`. `ImportLessonsUseCase` iterates `Import:Languages` ∩ each source's `SupportedLanguages`; adapters map to their own codes.
@@ -85,7 +84,7 @@ graph LR
   | `TranscribeStep` | `SourceAudioUrl` set, no segments | Submits the audio, polls until the transcript is ready, then adds the segments. |
   | `FinishStep` | always | Segments → `Complete()` (`Ready`). None → `Fail()`. |
 
-- `ImportLessonsUseCase.ExecuteAsync(source, ct)` holds the whole import business for one source. It fetches the new items, then for each one: skip it if a lesson with its `ExternalId` is already stored (`Ready` or `Failed`); otherwise `ToLesson`, run the pipeline, and save the result once. Re-runs are idempotent.
+- `ImportLessonsUseCase.ExecuteAsync(source, ct)` holds the whole import business for one source. It fetches the new lessons, then for each one: skip it if a lesson with its `ExternalId` is already stored (`Ready` or `Failed`); otherwise run the pipeline and save the result once (`Failed` on any error). Re-runs are idempotent.
 - `ImportWorker` (a hosted service, only when `Import:Enabled`) runs the use case once per registered `IContentSource` at app start, in parallel, each in its own DI scope. It holds no business logic.
 
 ### AD-4 — Lessons change only through `Lesson` methods

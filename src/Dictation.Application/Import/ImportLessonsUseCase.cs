@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Dictation.Application.Import;
 
 /// <summary>
-/// The import business for one source: fetch its new items, then import each one. An item already stored,
+/// The import business for one source: fetch its new lessons, then import each one. A lesson already stored,
 /// <c>Ready</c> or <c>Failed</c>, is skipped, so re-runs are idempotent and a failure is final.
 /// </summary>
 public sealed class ImportLessonsUseCase
@@ -42,11 +42,11 @@ public sealed class ImportLessonsUseCase
 
         foreach (var language in languages)
         {
-            IReadOnlyList<SourceItem> items;
+            IReadOnlyList<Lesson> lessons;
             try
             {
                 var knownKeys = await _repository.GetKnownKeysAsync(source.Key, ct).ConfigureAwait(false);
-                items = await source.FetchAsync(language, knownKeys, options.MaxPerSource, ct).ConfigureAwait(false);
+                lessons = await source.FetchAsync(language, knownKeys, options.MaxPerSource, ct).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
@@ -54,36 +54,31 @@ public sealed class ImportLessonsUseCase
                 return;
             }
 
-            foreach (var item in items)
+            foreach (var lesson in lessons)
             {
-                await ImportItemAsync(source, item, ct).ConfigureAwait(false);
+                await ImportLessonAsync(lesson, ct).ConfigureAwait(false);
             }
         }
     }
 
-    private async Task ImportItemAsync(IContentSource source, SourceItem item, CancellationToken ct)
+    private async Task ImportLessonAsync(Lesson lesson, CancellationToken ct)
     {
-        if (await _repository.ExistsAsync(source.Key, item.ExternalId, ct).ConfigureAwait(false))
+        if (await _repository.ExistsAsync(lesson.Source, lesson.ExternalId, ct).ConfigureAwait(false))
         {
             return;                                                             // idempotent re-runs
         }
 
-        Lesson? lesson = null;
         try
         {
-            lesson = source.ToLesson(item);                                     // adapter: their format to ours
             lesson = await _pipeline.RunAsync(lesson, ct).ConfigureAwait(false); // business steps
             await _repository.TryAddAsync(lesson, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // Log identifiers only, never payload content.
-            _logger.LogWarning(ex, "Import failed for {Source}/{ExternalId}", source.Key, item.ExternalId);
-            if (lesson is not null)
-            {
-                lesson.Fail();
-                await _repository.TryAddAsync(lesson, ct).ConfigureAwait(false);
-            }
+            _logger.LogWarning(ex, "Import failed for {Source}/{ExternalId}", lesson.Source, lesson.ExternalId);
+            lesson.Fail();
+            await _repository.TryAddAsync(lesson, ct).ConfigureAwait(false);
         }
     }
 }

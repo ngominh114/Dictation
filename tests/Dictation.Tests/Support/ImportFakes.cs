@@ -44,19 +44,15 @@ public sealed class StubStep(Func<Lesson, bool> appliesTo, Func<Lesson, Lesson>?
     }
 }
 
-/// <summary>A source whose items are ready-made lessons, so a test controls exactly what gets imported.</summary>
+/// <summary>A source that returns the given lessons, so a test controls exactly what gets imported.</summary>
 public sealed class StubSource(string key, params Lesson[] lessons) : IContentSource
 {
     public string Key => key;
 
     public IReadOnlyCollection<string> SupportedLanguages { get; } = ["en"];
 
-    public Task<IReadOnlyList<SourceItem>> FetchAsync(string language, IReadOnlySet<string> knownKeys, int max, CancellationToken ct) =>
-        Task.FromResult<IReadOnlyList<SourceItem>>(lessons.Select(l => new LessonItem(l)).ToList());
-
-    public Lesson ToLesson(SourceItem item) => ((LessonItem)item).Lesson;
-
-    private sealed record LessonItem(Lesson Lesson) : SourceItem(Lesson.ExternalId);
+    public Task<IReadOnlyList<Lesson>> FetchAsync(string language, IReadOnlySet<string> knownKeys, int max, CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<Lesson>>(lessons);
 }
 
 /// <summary>A pipeline over the given steps, in order.</summary>

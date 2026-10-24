@@ -4,7 +4,7 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
 
 ## All adapters
 
-- Each source and provider has its own `internal` DTOs in `Infrastructure`. Source adapters return them wrapped in a private `SourceItem` subtype from `FetchAsync`, and map one to a `Lesson` in `ToLesson` via `Lesson.CreateDiscovered` and `AddSegment`. Transcription adapters map them to `TranscribedSentence`.
+- A source adapter parses what the source sends, whatever the format, into its own `internal` DTOs (`{Source}Dtos.cs`), then maps them to a `Discovered` lesson in a private `ToLesson` via `Lesson.CreateDiscovered` and `AddSegment`. No model sits between the DTOs and `Lesson`. Transcription adapters map their own `internal` DTOs to `TranscribedSentence`.
 - Throw `ImportException(message)` for problems the provider signals or an unexpected status code. Other exceptions may propagate; any failure fails the lesson or skips the source (AD-5).
 - Never send a request to an audio URL (no `GET`, `HEAD` or stream). Never call a provider upload endpoint.
 - Declare a constant lowercase key (`bbc`, `tatoeba`, `assemblyai`, `gladia`).
@@ -15,7 +15,7 @@ Companion to `architecture-dictation-practice.md`. Per-adapter duties that imple
 - **Feed:** `Sources:Bbc:FeedUrl`. `ExternalId` = trimmed RSS `<guid>`, case preserved. Known keys = existing `ExternalId`s. Supported languages: `en`.
 - **Episode page:** derive it from `pubDate` with the two URL patterns in the BBC build notes. Fall back to the index page's `ep-` links. If neither resolves, skip the item with a log.
 - **Audio URL:** scrape it from the page during discovery. It must match `https://downloads.bbc.co.uk/…_download.mp3`. Never use the RSS enclosure.
-  - If the page has no link, `ToLesson` returns the lesson with `SourceAudioUrl = null` and no segments. `FinishStep` fails it and it is stored, so the episode is skipped from then on.
+  - If the page has no link, the lesson is returned with `SourceAudioUrl = null` and no segments. `FinishStep` fails it and it is stored, so the episode is skipped from then on.
 - **Transcript HTML:** not parsed or stored.
 - **HTTP client:** browser-like `User-Agent`; follow redirects.
 

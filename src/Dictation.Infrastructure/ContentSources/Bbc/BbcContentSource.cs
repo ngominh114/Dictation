@@ -38,7 +38,7 @@ public sealed partial class BbcContentSource : IContentSource
 
     public IReadOnlyCollection<string> SupportedLanguages { get; } = ["en"];
 
-    public async Task<IReadOnlyList<SourceItem>> FetchAsync(
+    public async Task<IReadOnlyList<Lesson>> FetchAsync(
         string language,
         IReadOnlySet<string> knownKeys,
         int max,
@@ -60,14 +60,14 @@ public sealed partial class BbcContentSource : IContentSource
             .OrderByDescending(e => e.PublishedAt)
             .ToList();
 
-        var items = new List<SourceItem>(max);
+        var lessons = new List<Lesson>(max);
         var seen = new HashSet<string>(StringComparer.Ordinal);
         string? indexPage = null;
         var indexLoaded = false;
 
         foreach (var entry in candidates)
         {
-            if (items.Count >= max)
+            if (lessons.Count >= max)
             {
                 break;
             }
@@ -110,29 +110,23 @@ public sealed partial class BbcContentSource : IContentSource
                 ? WebUtility.HtmlDecode(match.Value)
                 : null;
 
-            items.Add(new BbcEpisode(entry.Guid, entry.Title, pageUrl, audioUrl));
+            lessons.Add(ToLesson(entry, pageUrl, audioUrl));
         }
 
-        _logger.LogInformation("BBC returned {Count} new episode(s)", items.Count);
-        return items;
+        _logger.LogInformation("BBC returned {Count} new episode(s)", lessons.Count);
+        return lessons;
     }
 
-    public Lesson ToLesson(SourceItem item)
-    {
-        if (item is not BbcEpisode episode)
-        {
-            throw new ArgumentException($"Not a BBC item: {item.GetType().Name}.", nameof(item));
-        }
-
-        return Lesson.CreateDiscovered(
+    /// <summary>One episode becomes one lesson to transcribe (no segments yet).</summary>
+    private static Lesson ToLesson(BbcFeedItemDto item, string pageUrl, string? audioUrl) =>
+        Lesson.CreateDiscovered(
             SourceKey,
-            episode.ExternalId,
-            episode.Title,
+            item.Guid,
+            item.Title,
             "en",
-            episode.PageUrl,
-            episode.AudioUrl,
+            pageUrl,
+            audioUrl,
             DateTime.UtcNow);
-    }
 
     private string PageBaseUrl =>
         (string.IsNullOrWhiteSpace(_options.PageBaseUrl) ? DefaultPageBaseUrl : _options.PageBaseUrl.Trim()).TrimEnd('/');
@@ -169,7 +163,7 @@ public sealed partial class BbcContentSource : IContentSource
         return null;
     }
 
-    private IEnumerable<FeedEntry> ParseFeed(string xml)
+    private IEnumerable<BbcFeedItemDto> ParseFeed(string xml)
     {
         var document = XDocument.Parse(xml);
         foreach (var element in document.Descendants().Where(e => e.Name.LocalName == "item"))
@@ -189,7 +183,7 @@ public sealed partial class BbcContentSource : IContentSource
                 continue;
             }
 
-            yield return new FeedEntry(guid, title ?? "", publishedAt);
+            yield return new BbcFeedItemDto(guid, title ?? "", publishedAt);
         }
     }
 
@@ -238,13 +232,4 @@ public sealed partial class BbcContentSource : IContentSource
 
     [GeneratedRegex(@"\s([+-]\d{2})(\d{2})$")]
     private static partial Regex NumericOffsetRegex();
-
-    private sealed record FeedEntry(string Guid, string Title, DateTimeOffset PublishedAt)
-    {
-        /// <summary>Air date as published (in the feed's own offset).</summary>
-        public DateOnly AirDate => DateOnly.FromDateTime(PublishedAt.DateTime);
-    }
-
-    private sealed record BbcEpisode(string ExternalId, string Title, string PageUrl, string? AudioUrl)
-        : SourceItem(ExternalId);
 }
