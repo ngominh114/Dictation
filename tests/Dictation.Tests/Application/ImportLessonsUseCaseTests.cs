@@ -8,7 +8,7 @@ public sealed class ImportLessonsUseCaseTests
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
     [Fact]
-    public async Task Fits_every_source_lesson_with_segments_becomes_ready_and_lesson_with_nothing_fails()
+    public async Task ExecuteAsync_LessonsWithAndWithoutSegments_StoresReadyAndFailed()
     {
         var repository = new InMemoryLessonImportRepository();
         var withSegments = TestLessons.Create();
@@ -24,7 +24,7 @@ public sealed class ImportLessonsUseCaseTests
     }
 
     [Fact]
-    public async Task Step_failure_stores_the_lesson_as_failed_and_later_runs_skip_it()
+    public async Task ExecuteAsync_StepThrows_StoresLessonFailedAndSkipsItOnRerun()
     {
         var repository = new InMemoryLessonImportRepository();
         var audio = TestLessons.CreateAudio();
@@ -37,5 +37,16 @@ public sealed class ImportLessonsUseCaseTests
         Assert.Equal(LessonStatus.Failed, audio.Status);
         Assert.Single(repository.Lessons);
         Assert.Equal(1, failing.Runs);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_SourceFetchThrows_StoresNothingAndDoesNotThrow()
+    {
+        var repository = new InMemoryLessonImportRepository();
+        var source = new StubSource("bbc") { Error = new HttpRequestException("BBC is down") };
+
+        await TestImport.UseCase(repository, TestImport.Pipeline()).ExecuteAsync(source, Ct);
+
+        Assert.Empty(repository.Lessons);
     }
 }

@@ -14,7 +14,7 @@ public static class LessonEndpoints
         return app;
     }
 
-    private static async Task<IResult> ListAsync(
+    internal static async Task<IResult> ListAsync(
         ISender sender,
         CancellationToken cancellationToken,
         int page = 1,
@@ -36,7 +36,7 @@ public static class LessonEndpoints
         return Results.Ok(response);
     }
 
-    private static async Task<IResult> GetAsync(Guid id, ISender sender, CancellationToken cancellationToken)
+    internal static async Task<IResult> GetAsync(Guid id, ISender sender, CancellationToken cancellationToken)
     {
         var response = await sender.Send(new GetLessonQuery(id), cancellationToken).ConfigureAwait(false);
 

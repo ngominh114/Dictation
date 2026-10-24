@@ -2,11 +2,16 @@ using Dictation.Application.Import.Abstractions;
 
 namespace Dictation.Tests.Support;
 
-/// <summary>Accepts every submit and returns <paramref name="sentences"/> as the transcript.</summary>
+/// <summary>
+/// Accepts every submit and returns <paramref name="sentences"/> as the transcript, or throws <see cref="Error"/>
+/// when set.
+/// </summary>
 public sealed class FakeTranscriptionProvider(params TranscribedSentence[] sentences)
     : ITranscriptionProvider
 {
     public string Key => "fake";
+
+    public Exception? Error { get; init; }
 
     public List<string> Submitted { get; } = [];
 
@@ -17,5 +22,7 @@ public sealed class FakeTranscriptionProvider(params TranscribedSentence[] sente
     }
 
     public Task<IReadOnlyList<TranscribedSentence>> GetSentencesAsync(string jobId, CancellationToken ct) =>
-        Task.FromResult<IReadOnlyList<TranscribedSentence>>(sentences);
+        Error is null
+            ? Task.FromResult<IReadOnlyList<TranscribedSentence>>(sentences)
+            : Task.FromException<IReadOnlyList<TranscribedSentence>>(Error);
 }
