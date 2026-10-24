@@ -4,6 +4,8 @@ using Dictation.Api.Endpoints;
 using Dictation.Application.Import;
 using Dictation.Application.Import.Abstractions;
 using Dictation.Application.Import.Configurations;
+using Dictation.Application.Lessons;
+using Dictation.Application.Lessons.Abstractions;
 using Dictation.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +22,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 builder.Services.AddDbContext<DictationDbContext>((provider, options) =>
     options.UseSqlite(provider.GetRequiredService<IConfiguration>().GetConnectionString("Dictation")));
 builder.Services.AddScoped<ILessonImportRepository>(provider => provider.GetRequiredService<DictationDbContext>());
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddLessonQueries();
 
 builder.Services.AddOptions<ImportOptions>().BindConfiguration(ImportOptions.SectionName);

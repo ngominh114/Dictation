@@ -1,38 +1,36 @@
 using Dictation.Application.Lessons;
+using Dictation.Application.Lessons.Abstractions;
 using Dictation.Domain.Lessons;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dictation.Infrastructure.Persistence;
 
-/// <summary>Handles the lesson queries against SQLite. Only <c>Ready</c> lessons are visible.</summary>
-public sealed class LessonQueryHandlers(DictationDbContext db) :
-    IRequestHandler<GetLessonsQuery, LessonPage>,
-    IRequestHandler<GetLessonQuery, LessonDetail?>
+/// <summary>Reads <c>Ready</c> lessons from SQLite for the lesson queries.</summary>
+public sealed class LessonRepository(DictationDbContext db) : ILessonRepository
 {
     private IQueryable<Lesson> Ready => db.Lessons.AsNoTracking().Where(l => l.Status == LessonStatus.Ready);
 
-    public async Task<LessonPage> Handle(GetLessonsQuery query, CancellationToken ct)
+    public async Task<GetLessonsResponse> GetPageAsync(int page, int pageSize, CancellationToken ct)
     {
         var totalCount = await Ready.CountAsync(ct);
         var items = await Ready
             .OrderByDescending(l => l.CreatedAt)
             .ThenByDescending(l => l.Id)
-            .Skip((query.Page - 1) * query.PageSize)
-            .Take(query.PageSize)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(l => new LessonSummary(l.Id, l.Title, l.Source, l.Language, l.Segments.Count, l.CreatedAt))
             .ToListAsync(ct);
 
-        return new LessonPage(items, query.Page, query.PageSize, totalCount);
+        return new GetLessonsResponse(items, page, pageSize, totalCount);
     }
 
-    public async Task<LessonDetail?> Handle(GetLessonQuery query, CancellationToken ct)
+    public async Task<GetLessonResponse?> GetAsync(Guid id, CancellationToken ct)
     {
-        var lesson = await Ready.FirstOrDefaultAsync(l => l.Id == query.Id, ct);
+        var lesson = await Ready.FirstOrDefaultAsync(l => l.Id == id, ct);
 
         return lesson is null
             ? null
-            : new LessonDetail(
+            : new GetLessonResponse(
                 lesson.Id,
                 lesson.Title,
                 lesson.Source,

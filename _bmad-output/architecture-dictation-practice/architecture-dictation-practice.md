@@ -23,13 +23,13 @@ Per-adapter details are in [adapter-rules.md](adapter-rules.md). The REST endpoi
 
 ## Design Paradigm
 
-**Clean Architecture, kept small.** Four layers (Domain, Application, Infrastructure, Api) with dependencies pointing inward. `Application` defines the interfaces it needs (`IContentSource`, `ITranscriptionProvider`, `ILessonImportRepository`). Each external API gets one **adapter** in `Infrastructure` (Adapter pattern) that implements the interface and translates that API's DTOs to domain types. The import use case is a plain service. Reads use the **Mediator** pattern: an endpoint sends a query through MediatR's `ISender`, which forwards it to its handler.
+**Clean Architecture, kept small.** Four layers (Domain, Application, Infrastructure, Api) with dependencies pointing inward. `Application` defines the interfaces it needs (`IContentSource`, `ITranscriptionProvider`, `ILessonImportRepository`, `ILessonRepository`). Each external API gets one **adapter** in `Infrastructure` (Adapter pattern) that implements the interface and translates that API's DTOs to domain types. The import use case is a plain service. Reads use the **Mediator** pattern: an endpoint sends a query through MediatR's `ISender`, which forwards it to its handler.
 
 | Project | Holds |
 | --- | --- |
 | `Dictation.Domain` | `Lesson`, `Segment`, `LessonStatus`; no package references |
-| `Dictation.Application` | One folder per use case. `Import/`: `ImportLessonsUseCase`, `LessonPipeline`, `Steps/`, `Abstractions/` (interfaces for adapters and the repository), `Configurations/` (options), `ImportException`. `Lessons/`: the lesson queries and their result records. Shared: `Pipelines/` (`Pipeline<T>`, `IPipelineStep<T>`) |
-| `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonImportRepository`); `LessonQueryHandlers` |
+| `Dictation.Application` | One folder per use case. `Import/`: `ImportLessonsUseCase`, `LessonPipeline`, `Steps/`, `Abstractions/` (interfaces for adapters and the repository), `Configurations/` (options), `ImportException`. `Lessons/`: `Queries/` with one folder per query (query, handler, response type), plus `Abstractions/` (`ILessonRepository`). Shared: `Pipelines/` (`Pipeline<T>`, `IPipelineStep<T>`) |
+| `Dictation.Infrastructure` | Source and transcription adapters with their `internal` DTOs; `DictationDbContext` (EF Core mapping and migrations; it also implements `ILessonImportRepository`); `LessonRepository` |
 | `Dictation.Api` | `Program.cs`, Minimal API endpoints, `ImportWorker`, `wwwroot` UI |
 | `Dictation.Tests` | Unit tests of our own behaviour: domain, pipeline and use case with fakes |
 
@@ -51,7 +51,7 @@ graph LR
 
 ### AD-1 — Dependencies point inward; things plug in
 
-- `Domain` references nothing. `Application` references only `Domain`, `Microsoft.Extensions.*.Abstractions` and `MediatR.Contracts`. `Infrastructure` references only `Application`. Adapters never reference each other or the repository. Project references enforce this.
+- `Domain` references nothing. `Application` references only `Domain`, `Microsoft.Extensions.*.Abstractions` and `MediatR`. `Infrastructure` references only `Application`. Adapters never reference each other or the repository. Project references enforce this.
 - Sources and providers have constant lowercase keys (`bbc`, `tatoeba`, `assemblyai`, `gladia`), not enums.
 - Add a source = adapter + DI registration + config. Add a step = step + one line in `LessonPipeline.ConfigureSteps`.
 
@@ -117,7 +117,7 @@ graph LR
 
 - `wwwroot` calls only the endpoints in [web-contract.md](web-contract.md); only `Ready` lessons are exposed.
 - Lesson detail includes each segment's text; the UI keeps it hidden until the transcript button is pressed.
-- Each endpoint sends one query (`GetLessonsQuery`, `GetLessonQuery`) through `ISender`. The queries and result records live in `Application/Lessons`; `LessonQueryHandlers` in Infrastructure answers them from `DictationDbContext` with `AsNoTracking()`, filtered to `Ready`. Endpoints only validate input and map a null result to 404.
+- Each endpoint sends one query (`GetLessonsQuery`, `GetLessonQuery`) through `ISender`; each query has its own handler in Application and its own response type (`GetLessonsResponse`, `GetLessonResponse`). The detail handler returns null for a missing or non-`Ready` lesson, and the endpoint answers `response is null ? NotFound() : Ok(response)`. The list endpoint replaces an out-of-range `page` or `pageSize` with its default before sending. Handlers read through `ILessonRepository`; `LessonRepository` in Infrastructure answers from `DictationDbContext` with `AsNoTracking()`, filtered to `Ready`.
 
 ### AD-9 — Unit tests of our behaviour only
 

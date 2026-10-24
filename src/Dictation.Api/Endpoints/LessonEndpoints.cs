@@ -1,15 +1,11 @@
 using Dictation.Application.Lessons;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Dictation.Api.Endpoints;
 
 /// <summary>The lesson endpoints the UI calls (web-contract.md). Each one sends a query through the mediator.</summary>
 public static class LessonEndpoints
 {
-    private const int DefaultPageSize = 20;
-    private const int MaxPageSize = 100;
-
     public static IEndpointRouteBuilder MapLessonEndpoints(this IEndpointRouteBuilder app)
     {
         var lessons = app.MapGroup("/api/lessons");
@@ -18,33 +14,34 @@ public static class LessonEndpoints
         return app;
     }
 
-    private static async Task<Results<Ok<LessonPage>, ProblemHttpResult>> ListAsync(
+    private static async Task<IResult> ListAsync(
         ISender sender,
-        CancellationToken ct,
+        CancellationToken cancellationToken,
         int page = 1,
-        int pageSize = DefaultPageSize)
+        int pageSize = GetLessonsQuery.DefaultPageSize)
     {
+        // Out-of-range paging falls back to the defaults instead of failing.
         if (page < 1)
         {
-            return TypedResults.Problem(statusCode: StatusCodes.Status400BadRequest, detail: "page must be 1 or more.");
+            page = 1;
         }
 
-        if (pageSize is < 1 or > MaxPageSize)
+        if (pageSize is < 1 or > GetLessonsQuery.MaxPageSize)
         {
-            return TypedResults.Problem(
-                statusCode: StatusCodes.Status400BadRequest,
-                detail: $"pageSize must be between 1 and {MaxPageSize}.");
+            pageSize = GetLessonsQuery.DefaultPageSize;
         }
 
-        return TypedResults.Ok(await sender.Send(new GetLessonsQuery(page, pageSize), ct));
+        var response = await sender.Send(new GetLessonsQuery(page, pageSize), cancellationToken).ConfigureAwait(false);
+
+        return Results.Ok(response);
     }
 
-    private static async Task<Results<Ok<LessonDetail>, ProblemHttpResult>> GetAsync(
-        Guid id,
-        ISender sender,
-        CancellationToken ct) =>
-        await sender.Send(new GetLessonQuery(id), ct) is { } lesson ? TypedResults.Ok(lesson) : LessonNotFound();
+    private static async Task<IResult> GetAsync(Guid id, ISender sender, CancellationToken cancellationToken)
+    {
+        var response = await sender.Send(new GetLessonQuery(id), cancellationToken).ConfigureAwait(false);
 
-    private static ProblemHttpResult LessonNotFound() =>
-        TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: "Lesson not found.");
+        return response is null
+            ? Results.NotFound()
+            : Results.Ok(response);
+    }
 }

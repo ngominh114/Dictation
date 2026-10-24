@@ -11,7 +11,7 @@ Only `Ready` lessons are exposed. A missing or non-`Ready` id returns 404 `Probl
 | `GET /api/lessons?page&pageSize` | `{ items: [{ id, title, source, language, segmentCount, createdAt }], page, pageSize, totalCount }` |
 | `GET /api/lessons/{id}` | `{ id, title, source, language, sourceUrl, segments: [{ index, text, audioUrl, startMs, endMs? }] }` |
 
-- **Paging:** `page` is 1-based (default 1). `pageSize` defaults to 20, range 1–100; out of range → 400 `ProblemDetails`.
+- **Paging:** `page` is 1-based (default 1). `pageSize` defaults to 20, range 1–100. An out-of-range value falls back to its default (`page` 1, `pageSize` 20); it is never an error.
 - **Order:** `createdAt DESC, id DESC`.
 - **Segments:** sorted by `index` ascending.
 
